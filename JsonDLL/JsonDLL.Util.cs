@@ -29,7 +29,7 @@ public class Util
         if (Path.IsPathRooted(exe))
         {
             if (!File.Exists(exe)) return null;
-            return exe;
+            return Path.GetFullPath(exe);
         }
         var cwd = Directory.GetCurrentDirectory();
         var PATH = Environment.GetEnvironmentVariable("PATH") ?? "";
