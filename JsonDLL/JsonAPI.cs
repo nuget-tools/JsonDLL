@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -16,9 +17,7 @@ public class JsonAPI
     }
     public JsonAPI(string dllName)
     {
-        //Tool.Print(dllName, "dllName");
-        // for client
-        //Environment.Exit(1234);
+#if false
         if (System.IO.Path.IsPathRooted(dllName))
         {
             this.handle = LoadLibraryExW(
@@ -31,9 +30,37 @@ public class JsonAPI
         {
             this.handle = LoadLibraryW(dllName);
         }
-        //Tool.Print(handle, "handle");
+#else
+        if (!System.IO.Path.IsPathRooted(dllName))
+        {
+            dllName = FindExePath(dllName);
+            Util.Log(dllName, "DLL found in PATH");
+        }
+        this.handle = LoadLibraryExW(
+            dllName,
+            IntPtr.Zero,
+            LoadLibraryFlags.LOAD_WITH_ALTERED_SEARCH_PATH
+            );
+#endif
         this.funcPtr = GetProcAddress(handle, "Call");
-        //Tool.Print(this.funcPtr, "this.funcPtr");
+    }
+    private static string FindExePath(string exe)
+    {
+        exe = Environment.ExpandEnvironmentVariables(exe);
+        if (!File.Exists(exe))
+        {
+            if (Path.GetDirectoryName(exe) == String.Empty)
+            {
+                foreach (string test in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(';'))
+                {
+                    string path = test.Trim();
+                    if (!String.IsNullOrEmpty(path) && File.Exists(path = Path.Combine(path, exe)))
+                        return Path.GetFullPath(path);
+                }
+            }
+            return null;
+        }
+        return Path.GetFullPath(exe);
     }
     public dynamic Call(dynamic name, dynamic args)
     {
