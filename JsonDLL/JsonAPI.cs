@@ -35,13 +35,18 @@ public class JsonAPI
         Util.Log(dllSpec, "dllSpec");
         string dllPath = Util.FindExePath(dllSpec);
         Util.Log(dllPath, "dllPath");
+        if (dllPath is null) Environment.Exit(1);
         this.handle = LoadLibraryExW(
             dllPath,
             IntPtr.Zero,
             LoadLibraryFlags.LOAD_WITH_ALTERED_SEARCH_PATH
             );
+        if (this.handle == IntPtr.Zero)
+        {
+            Util.Log("DLL not loaded");
+            Environment.Exit(1);
+        }
 #endif
-        if (dllPath is null) Environment.Exit(1);
         this.funcPtr = GetProcAddress(handle, "Call");
         if (this.funcPtr == IntPtr.Zero)
         {

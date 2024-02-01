@@ -25,9 +25,13 @@ public class Util
     }
     public static string FindExePath(string exe)
     {
-        if (Path.IsPathRooted(exe)) return exe;
-        var cwd = Directory.GetCurrentDirectory();
         exe = Environment.ExpandEnvironmentVariables(exe);
+        if (Path.IsPathRooted(exe))
+        {
+            if (!File.Exists(exe)) return null;
+            return exe;
+        }
+        var cwd = Directory.GetCurrentDirectory();
         var PATH = Environment.GetEnvironmentVariable("PATH") ?? "";
         PATH = $"{cwd};{PATH}";
         foreach (string test in PATH.Split(';'))
