@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using System.Threading;
 
 namespace JsonDLL;
@@ -15,7 +16,7 @@ public class JsonAPI
     {
         // for server
     }
-    public JsonAPI(string dllName)
+    public JsonAPI(string dllSpec)
     {
 #if false
         if (System.IO.Path.IsPathRooted(dllName))
@@ -31,36 +32,37 @@ public class JsonAPI
             this.handle = LoadLibraryW(dllName);
         }
 #else
-        if (!System.IO.Path.IsPathRooted(dllName))
-        {
-            dllName = FindExePath(dllName);
-            Util.Log(dllName, "DLL found in PATH");
-        }
+        Util.Log(dllSpec, "dllSpec");
+        string dllPath = FindExePath(dllSpec);
+        Util.Log(dllPath, "dllPath");
         this.handle = LoadLibraryExW(
-            dllName,
+            dllPath,
             IntPtr.Zero,
             LoadLibraryFlags.LOAD_WITH_ALTERED_SEARCH_PATH
             );
 #endif
+        if (dllPath is null) Environment.Exit(1);
         this.funcPtr = GetProcAddress(handle, "Call");
+        if (this.funcPtr == IntPtr.Zero)
+        {
+            Util.Log("Call() not found");
+            Environment.Exit(1);
+        }
     }
     private static string FindExePath(string exe)
     {
+        if (Path.IsPathRooted(exe)) return exe;
+        var cwd = Directory.GetCurrentDirectory();
         exe = Environment.ExpandEnvironmentVariables(exe);
-        if (!File.Exists(exe))
+        var PATH = Environment.GetEnvironmentVariable("PATH") ?? "";
+        PATH = $"{cwd};{PATH}";
+        foreach (string test in PATH.Split(';'))
         {
-            if (Path.GetDirectoryName(exe) == String.Empty)
-            {
-                foreach (string test in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(';'))
-                {
-                    string path = test.Trim();
-                    if (!String.IsNullOrEmpty(path) && File.Exists(path = Path.Combine(path, exe)))
-                        return Path.GetFullPath(path);
-                }
-            }
-            return null;
+            string path = test.Trim();
+            if (!String.IsNullOrEmpty(path) && File.Exists(path = Path.Combine(path, exe)))
+                return Path.GetFullPath(path);
         }
-        return Path.GetFullPath(exe);
+        return null;
     }
     public dynamic Call(dynamic name, dynamic args)
     {
