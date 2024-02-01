@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿// https://codereview.stackexchange.com/questions/70679/seekable-http-range-stream
+using System.IO;
 using System.Net;
 using System;
 using static JsonDLL.Util;
@@ -7,10 +8,11 @@ using CurlThin.Enums;
 using CurlThin.Helpers;
 using CurlThin.SafeHandles;
 using System.Text;
+using System.Web.Routing;
 
 namespace JsonDLL;
 
-public class PartialHttpStream : Stream, IDisposable
+public class PartialHTTPStream : Stream, IDisposable
 {
     private const int CacheLen = 1024*1024;
     CURLcode global = CurlNative.Init();
@@ -25,11 +27,11 @@ public class PartialHttpStream : Stream, IDisposable
     private long cachePosition;
     private int cacheCount;
 
-     static PartialHttpStream()
+     static PartialHTTPStream()
     {
         LibCurlLoader.Initialize();
     }
-    public PartialHttpStream(string url, int cacheLen = CacheLen)
+    public PartialHTTPStream(string url, int cacheLen = CacheLen)
     {
         if (string.IsNullOrEmpty(url))
             throw new ArgumentException("url empty");
@@ -160,6 +162,7 @@ public class PartialHttpStream : Stream, IDisposable
 
         //Log($"Result code: {result}.");
         var bytes = dataCopier.Stream.ToArray();
+        easy.Dispose();
         //Log(bytes.Length, "Response body length");
         bytes.CopyTo(buffer, 0);
         return bytes.Length;
@@ -168,9 +171,42 @@ public class PartialHttpStream : Stream, IDisposable
     private long HttpGetLength()
     {
         HttpRequestsCount++;
+#if false
         HttpWebRequest request = HttpWebRequest.CreateHttp(Url);
         request.Method = "HEAD";
         return request.GetResponse().ContentLength;
+#else
+        var easy = CurlNative.Easy.Init();
+        var headCopier = new DataCallbackCopier();
+        CurlNative.Easy.SetOpt(easy, CURLoption.URL, Url);
+        CurlNative.Easy.SetOpt(easy, CURLoption.NOBODY, 1); // HEAD?
+        CurlNative.Easy.SetOpt(easy, CURLoption.HEADERFUNCTION, headCopier.DataHandler);
+        CurlNative.Easy.SetOpt(easy, CURLoption.FOLLOWLOCATION, 1);
+        CurlNative.Easy.SetOpt(easy, CURLoption.SSL_VERIFYPEER, 0);
+        CurlNative.Easy.SetOpt(easy, CURLoption.SSL_VERIFYHOST, 0);
+        var result = CurlNative.Easy.Perform(easy);
+        //Log(result.ToString());
+        CurlNative.Easy.GetInfo(easy, CURLINFO.RESPONSE_CODE, out int httpCode);
+        //Log(httpCode, "httpCode");
+        string headers = headCopier.ReadAsString();
+        string line;
+        StringReader streamReader = new StringReader(headers);
+        long n = 0;
+        while ((line = streamReader.ReadLine()) != null)
+        {
+            //Log(line, "line");
+            if (line.ToUpper().StartsWith("CONTENT-LENGTH:"))
+            {
+                line = line.Substring(15).Trim();
+                //Log($"line='{line}'");
+                n = long.Parse(line);
+                //Log($"n={n}");
+            }
+
+        }
+        easy.Dispose();
+        return n;
+#endif
     }
 
     private new void Dispose()
@@ -186,9 +222,11 @@ public class PartialHttpStream : Stream, IDisposable
             response.Dispose();
             response = null;
         }
+        /*
         if (global == CURLcode.OK)
         {
             CurlNative.Cleanup();
         }
+        */
     }
 }

@@ -11,7 +11,7 @@ public static class TextEmbedder
     {
         Log($"TextEmbedFromUrl(): searchLimit={searchLimit}");
         long endPos = -1;
-        var phs = new PartialHttpStream(url, 1000000);
+        var phs = new PartialHTTPStream(url, 1000000);
         var phsr = new System.IO.StreamReader(phs, System.Text.Encoding.UTF8);
         phs.Seek(0, System.IO.SeekOrigin.Begin);
         int shortLen = 1024*1024;
@@ -125,7 +125,7 @@ public static class TextEmbedder
     {
         long searchLimit = -1;
         long endPos = -1;
-        var phs = new PartialHttpStream(url, 1000000);
+        var phs = new PartialHTTPStream(url, 1000000);
         var phsr = new System.IO.StreamReader(phs, System.Text.Encoding.UTF8);
         if (searchLimit < 0 || searchLimit > phs.Length) searchLimit = phs.Length;
         phs.Seek(phs.Length - searchLimit, System.IO.SeekOrigin.Begin);
