@@ -37,15 +37,15 @@ public class JsonAPI
     }
     public dynamic Call(dynamic name, dynamic args)
     {
-        IntPtr pName = Tool.StringToUTF8Addr(name);
+        IntPtr pName = Util.StringToUTF8Addr(name);
         proto_Call pCall = (proto_Call)Marshal.GetDelegateForFunctionPointer(this.funcPtr, typeof(proto_Call));
-        var argsJson = Tool.ToJson(args);
-        IntPtr pArgsJson = Tool.StringToUTF8Addr(argsJson);
+        var argsJson = Util.ToJson(args);
+        IntPtr pArgsJson = Util.StringToUTF8Addr(argsJson);
         IntPtr pResult = pCall(pName, pArgsJson);
-        string result = Tool.UTF8AddrToString(pResult);
+        string result = Util.UTF8AddrToString(pResult);
         Marshal.FreeHGlobal(pName);
         Marshal.FreeHGlobal(pArgsJson);
-        return Tool.FromJson(result);
+        return Util.FromJson(result);
     }
     public dynamic CallOne(dynamic name, dynamic args)
     {
@@ -60,20 +60,20 @@ public class JsonAPI
         //Tool.Print("HandleCall(1)");
         if (HandleCallPtr.Value != IntPtr.Zero)
         {
-            Tool.FreeHGlobal(HandleCallPtr.Value);
+            Util.FreeHGlobal(HandleCallPtr.Value);
             HandleCallPtr.Value = IntPtr.Zero;
         }
-        var name = Tool.UTF8AddrToString(nameAddr);
-        var input = Tool.UTF8AddrToString(inputAddr);
-        var args = Tool.FromJson(input);
+        var name = Util.UTF8AddrToString(nameAddr);
+        var input = Util.UTF8AddrToString(inputAddr);
+        var args = Util.FromJson(input);
         MethodInfo mi = apiType.GetMethod(name);
         dynamic result = null;
         if (mi != null)
         {
             result = mi.Invoke(null, new object[] { args });
         }
-        var output = Tool.ToJson(result);
-        HandleCallPtr.Value = Tool.StringToUTF8Addr(output);
+        var output = Util.ToJson(result);
+        HandleCallPtr.Value = Util.StringToUTF8Addr(output);
         return HandleCallPtr.Value;
 #else
         return IntPtr.Zero;

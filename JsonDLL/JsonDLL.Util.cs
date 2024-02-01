@@ -12,16 +12,15 @@ using System.Text;
 using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace JsonDLL;
 
 /** @brief MyClass does something
  * @details I have something more long winded to say about it.  See example 
  * in test.cs: @include test.cs */
-public class Tool
+public class Util
 {
-    static Tool()
+    static Util()
     {
     }
     public static string AssemblyDirectory(Assembly assembly)
@@ -138,7 +137,7 @@ public class Tool
     public static DateTime? AsDateTime(dynamic x)
     {
         if (x is null) return null;
-        string fullName = Tool.FullName(x);
+        string fullName = Util.FullName(x);
         if (fullName == "Newtonsoft.Json.Linq.JValue")
         {
             return ((DateTime)x);
@@ -336,7 +335,7 @@ public class Tool
         else if (x is System.DateTime)
         {
             //return x.ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffffffzzz");
-            return Tool.DateTimeString(x); //x.ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffffffzzz");
+            return Util.DateTimeString(x); //x.ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffffffzzz");
         }
         else
         {
@@ -356,7 +355,7 @@ public class Tool
     {
         String s = "";
         if (title != null) s = title + ": ";
-        s += Tool.ToString(x);
+        s += Util.ToString(x);
         Console.WriteLine(s);
         System.Diagnostics.Debug.WriteLine(s);
     }
@@ -365,7 +364,7 @@ public class Tool
     {
         String s = "";
         if (title != null) s = title + ": ";
-        s += Tool.ToString(x);
+        s += Util.ToString(x);
         Console.Error.WriteLine(s);
         System.Diagnostics.Debug.WriteLine(s);
     }
@@ -452,20 +451,20 @@ public class Tool
             }
             else
             {
-                Tool.Log(s, title);
+                Util.Log(s, title);
             }
             return;
         }
 
         {
-            var s = Tool.ToString(x);
+            var s = Util.ToString(x);
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
                 NativeMethods.MessageBoxW(IntPtr.Zero, s, title, 0);
             }
             else
             {
-                Tool.Log(s, title);
+                Util.Log(s, title);
             }
         }
         /*

@@ -13,12 +13,12 @@ public static class Extensions
     public static dynamic? FromJson(this string x)
     {
         if (x == null) return null;
-        return Tool.FromJson(x);
+        return Util.FromJson(x);
     }
 
     public static T? FromJson<T>(this string x, T? fallback = default(T))
     {
-        return Tool.FromJson<T>(x, fallback);
+        return Util.FromJson<T>(x, fallback);
     }
 
     public static XmlDocument ToXmlDocument(this XDocument xDocument)
