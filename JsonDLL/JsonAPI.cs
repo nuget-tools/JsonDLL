@@ -33,7 +33,7 @@ public class JsonAPI
         }
 #else
         Util.Log(dllSpec, "dllSpec");
-        string dllPath = FindExePath(dllSpec);
+        string dllPath = Util.FindExePath(dllSpec);
         Util.Log(dllPath, "dllPath");
         this.handle = LoadLibraryExW(
             dllPath,
@@ -48,21 +48,6 @@ public class JsonAPI
             Util.Log("Call() not found");
             Environment.Exit(1);
         }
-    }
-    private static string FindExePath(string exe)
-    {
-        if (Path.IsPathRooted(exe)) return exe;
-        var cwd = Directory.GetCurrentDirectory();
-        exe = Environment.ExpandEnvironmentVariables(exe);
-        var PATH = Environment.GetEnvironmentVariable("PATH") ?? "";
-        PATH = $"{cwd};{PATH}";
-        foreach (string test in PATH.Split(';'))
-        {
-            string path = test.Trim();
-            if (!String.IsNullOrEmpty(path) && File.Exists(path = Path.Combine(path, exe)))
-                return Path.GetFullPath(path);
-        }
-        return null;
     }
     public dynamic Call(dynamic name, dynamic args)
     {

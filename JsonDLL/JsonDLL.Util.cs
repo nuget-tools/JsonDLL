@@ -23,6 +23,21 @@ public class Util
     static Util()
     {
     }
+    public static string FindExePath(string exe)
+    {
+        if (Path.IsPathRooted(exe)) return exe;
+        var cwd = Directory.GetCurrentDirectory();
+        exe = Environment.ExpandEnvironmentVariables(exe);
+        var PATH = Environment.GetEnvironmentVariable("PATH") ?? "";
+        PATH = $"{cwd};{PATH}";
+        foreach (string test in PATH.Split(';'))
+        {
+            string path = test.Trim();
+            if (!String.IsNullOrEmpty(path) && File.Exists(path = Path.Combine(path, exe)))
+                return Path.GetFullPath(path);
+        }
+        return null;
+    }
     public static string AssemblyDirectory(Assembly assembly)
     {
         string codeBase = assembly.CodeBase;
