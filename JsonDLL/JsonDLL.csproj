@@ -40,8 +40,13 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="CurlThin" Version="0.0.7" />
+		<PackageReference Include="CurlThin.Native" Version="0.0.8" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="../README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="*.dll" />
 	</ItemGroup>
 </Project>
