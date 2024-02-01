@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -19,6 +18,7 @@ public class JsonAPI
     {
         //Tool.Print(dllName, "dllName");
         // for client
+        //Environment.Exit(1234);
         if (System.IO.Path.IsPathRooted(dllName))
         {
             this.handle = LoadLibraryExW(
@@ -31,7 +31,9 @@ public class JsonAPI
         {
             this.handle = LoadLibraryW(dllName);
         }
+        //Tool.Print(handle, "handle");
         this.funcPtr = GetProcAddress(handle, "Call");
+        //Tool.Print(this.funcPtr, "this.funcPtr");
     }
     public dynamic Call(dynamic name, dynamic args)
     {
@@ -54,6 +56,8 @@ public class JsonAPI
     static ThreadLocal<IntPtr> HandleCallPtr = new ThreadLocal<IntPtr>();
     public IntPtr HandleCall(Type apiType, IntPtr nameAddr, IntPtr inputAddr)
     {
+#if true
+        //Tool.Print("HandleCall(1)");
         if (HandleCallPtr.Value != IntPtr.Zero)
         {
             Tool.FreeHGlobal(HandleCallPtr.Value);
@@ -71,6 +75,9 @@ public class JsonAPI
         var output = Tool.ToJson(result);
         HandleCallPtr.Value = Tool.StringToUTF8Addr(output);
         return HandleCallPtr.Value;
+#else
+        return IntPtr.Zero;
+#endif
     }
     [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern IntPtr LoadLibraryW(string lpFileName);
