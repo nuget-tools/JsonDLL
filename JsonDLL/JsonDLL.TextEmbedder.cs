@@ -7,15 +7,30 @@ namespace JsonDLL;
 
 public static class TextEmbedder
 {
-    private static string EmbeddedTextFromUrl(string url, long searchLimit)
+    private static string TextEmbedFromUrl(string url, long searchLimit)
     {
+        Log($"TextEmbedFromUrl(): searchLimit={searchLimit}");
         long endPos = -1;
         var phs = new PartialHttpStream(url, 1000000);
         var phsr = new System.IO.StreamReader(phs, System.Text.Encoding.UTF8);
-        if (searchLimit < 0 || searchLimit > phs.Length) searchLimit = phs.Length;
-        phs.Seek(phs.Length - searchLimit, System.IO.SeekOrigin.Begin);
-        byte[] byteArray = new byte[searchLimit];
-        phs.Read(byteArray, 0, (int)searchLimit);
+        phs.Seek(0, System.IO.SeekOrigin.Begin);
+        int shortLen = 1024*1024;
+        byte[] byteArray = new byte[shortLen];
+        long readLen = phs.Read(byteArray, 0, shortLen);
+        Log(readLen, "hsortResult");
+        if (readLen >= shortLen)
+        {
+            if (searchLimit < 0 || searchLimit > phs.Length) searchLimit = phs.Length;
+            phs.Seek(phs.Length - searchLimit, System.IO.SeekOrigin.Begin);
+            byteArray = new byte[searchLimit];
+            phs.Read(byteArray, 0, (int)searchLimit);
+        }
+        else
+        {
+            byte[] newArray = new byte[readLen];
+            Array.Copy(byteArray, 0, newArray, 0, newArray.Length);
+            byteArray = newArray;
+        }
         MemoryStream ms = new MemoryStream(byteArray);
         StreamReader sr = new StreamReader(ms);
         for (long i = 0; i < searchLimit; i++)
@@ -35,7 +50,7 @@ public static class TextEmbedder
                     ms.Seek(startPos, System.IO.SeekOrigin.Begin);
                     ms.Read(result, 0, result.Length);
                     string text = System.Text.Encoding.UTF8.GetString(result).Trim();
-                    ms.Close();
+                    phs.Close();
                     return text;
                 }
             }
@@ -49,9 +64,10 @@ public static class TextEmbedder
                 }
             }
         }
+        //Log("Z");
         return null;
     }
-    public static string EmbeddedText(string path, long searchLimit = 8192)
+    public static string TextEmbed(string path, long searchLimit = 8192)
     {
         //Log(path, "path");
         try
@@ -59,7 +75,7 @@ public static class TextEmbedder
             if (path.StartsWith("http:") || path.StartsWith("https:"))
             {
                 //Log("is url");
-                return EmbeddedTextFromUrl(path, searchLimit);
+                return TextEmbedFromUrl(path, searchLimit);
             }
             long endPos = -1;
             var fs = System.IO.File.OpenRead(path);
@@ -105,7 +121,7 @@ public static class TextEmbedder
             return null;
         }
     }
-    private static string TextWithoutEmbeddingFromUrl(string url)
+    private static string TextActualFromUrl(string url)
     {
         long searchLimit = -1;
         long endPos = -1;
@@ -134,7 +150,7 @@ public static class TextEmbedder
                     ms.Seek(0, System.IO.SeekOrigin.Begin);
                     ms.Read(result, 0, result.Length);
                     string text = System.Text.Encoding.UTF8.GetString(result);
-                    ms.Close();
+                    phs.Close();
                     return text;
                 }
             }
@@ -148,9 +164,18 @@ public static class TextEmbedder
                 }
             }
         }
-        return null;
+        {
+            var result = new byte[phs.Length];
+            phs.Seek(0, System.IO.SeekOrigin.Begin);
+            phs.Read(result, 0, result.Length);
+            string text = System.Text.Encoding.UTF8.GetString(result);
+            phs.Close();
+            return text;
+
+            //return null;
+        }
     }
-    public static string TextWithoutEmbedding(string path)
+    public static string TextActual(string path)
     {
         //Log(path, "path");
         long searchLimit = -1;
@@ -159,7 +184,7 @@ public static class TextEmbedder
             if (path.StartsWith("http:") || path.StartsWith("https:"))
             {
                 Log("is url");
-                return TextWithoutEmbeddingFromUrl(path);
+                return TextActualFromUrl(path);
             }
             long endPos = -1;
             var fs = System.IO.File.OpenRead(path);
@@ -196,8 +221,15 @@ public static class TextEmbedder
                     }
                 }
             }
-            fs.Close();
-            return null;
+            {
+                var result = new byte[fs.Length];
+                fs.Seek(0, System.IO.SeekOrigin.Begin);
+                fs.Read(result, 0, result.Length);
+                string text = System.Text.Encoding.UTF8.GetString(result);
+                fs.Close();
+                return text;
+                //return null;
+            }
         }
         catch (Exception e)
         {

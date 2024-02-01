@@ -401,13 +401,14 @@ public class Util
 
     public static Stream? ResourceAsStream(Assembly assembly, string name)
     {
-        Stream? stream = assembly.GetManifestResourceStream($"{AssemblyName(assembly)}.{name}");
+        string resourceName = name.Contains(":") ? name.Replace(":", ".") : $"{AssemblyName(assembly)}.{name}";
+        Stream? stream = assembly.GetManifestResourceStream(resourceName);
         return stream;
     }
 
     public static string StreamAsText(Stream stream)
     {
-        if (stream is null) return "";
+        if (stream is null) return null; // "";
         long pos = stream.Position;
         var streamReader = new StreamReader(stream);
         var text = streamReader.ReadToEnd();
@@ -417,13 +418,14 @@ public class Util
 
     public static string ResourceAsText(Assembly assembly, string name)
     {
-        Stream stream = assembly.GetManifestResourceStream($"{AssemblyName(assembly)}.{name}");
+        string resourceName = name.Contains(":") ? name.Replace(":", ".") : $"{AssemblyName(assembly)}.{name}";
+        Stream stream = assembly.GetManifestResourceStream(resourceName);
         return StreamAsText(stream);
     }
 
     public static byte[] StreamAsBytes(Stream stream)
     {
-        if (stream is null) return new byte[] { };
+        if (stream is null) return null; // new byte[] { };
         long pos = stream.Position;
         byte[] bytes = new byte[(int)stream.Length];
         stream.Read(bytes, 0, (int)stream.Length);
@@ -433,7 +435,8 @@ public class Util
 
     public static byte[] ResourceAsBytes(Assembly assembly, string name)
     {
-        Stream stream = assembly.GetManifestResourceStream($"{AssemblyName(assembly)}.{name}");
+        string resourceName = name.Contains(":") ? name.Replace(":", ".") : $"{AssemblyName(assembly)}.{name}";
+        Stream stream = assembly.GetManifestResourceStream(resourceName);
         return StreamAsBytes(stream);
     }
 

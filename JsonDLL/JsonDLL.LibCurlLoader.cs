@@ -11,7 +11,7 @@ public class LibCurlLoader
         int bit = IntPtr.Size * 8;
         var dir = Dirs.ProfilePath("JavaCommons Technologies", "JsonDLL");
         dir = Path.Combine(dir, $"x{bit}");
-        var dllBytes = Util.ResourceAsBytes(typeof(LibCurlLoader).Assembly, $"libcurl-x{bit}.dll");
+        var dllBytes = Util.ResourceAsBytes(typeof(LibCurlLoader).Assembly, $"JsonDLL:libcurl-x{bit}.dll");
         var dllPath = Path.Combine(dir, "libcurl.dll");
         if (File.Exists(dllPath))
         {

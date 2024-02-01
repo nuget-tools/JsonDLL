@@ -154,7 +154,6 @@ public class PartialHttpStream : Stream, IDisposable
         //CurlNative.Slist.Append(headers, "X-Qwerty: Asdfgh");
         CurlNative.Easy.SetOpt(easy, CURLoption.HTTPHEADER, headers.DangerousGetHandle());
 
-
         var result = CurlNative.Easy.Perform(easy);
 
         CurlNative.Slist.FreeAll(headers);
