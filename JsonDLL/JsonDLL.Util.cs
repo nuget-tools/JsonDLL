@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Media;
 
 namespace JsonDLL;
 
@@ -23,6 +24,60 @@ public class Util
     public static bool DebugFlag = false;
     static Util()
     {
+    }
+    public static byte[] ReadFileHeadBytes(string path, int maxSize)
+    {
+        System.IO.FileStream fs = new System.IO.FileStream(
+            path,
+            System.IO.FileMode.Open,
+            System.IO.FileAccess.Read);
+        byte[] array = new byte[maxSize];
+        int size = fs.Read(array, 0, array.Length);
+        fs.Close();
+        byte[] result = new byte[size];
+        Array.Copy(array, 0, result, 0, result.Length);
+        return result;
+    }
+    public static bool IsBinaryFile(string path)
+    {
+        byte[] head = ReadFileHeadBytes(path, 8000);
+        for (int i = 0; i < head.Length; i++)
+        {
+            if (head[i] == 0) return true;
+        }
+        return false;
+    }
+    public static bool LaunchProcess(string exePath, string[] args, Dictionary<string, string>? vars = null)
+    {
+        string text = "";
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (i > 0)
+            {
+                text += " ";
+            }
+
+            text = text + "\"" + args[i] + "\"";
+        }
+        Process process = new Process();
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.CreateNoWindow = true;
+        process.StartInfo.FileName = exePath;
+        process.StartInfo.Arguments = text;
+        if (vars != null)
+        {
+            foreach (string key in vars.Keys)
+            {
+                process.StartInfo.EnvironmentVariables[key] = vars[key];
+            }
+        }
+        return process.Start();
+    }
+    public static void Beep()
+    {
+        SystemSounds.Beep.Play();
     }
     public static string FindExePath(string exe)
     {
