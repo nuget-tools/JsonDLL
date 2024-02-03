@@ -143,10 +143,12 @@ public class Dirs
 
     public static void CreateDirectory(string path)
     {
+#if false
         if (!Directory.Exists(Path.GetDirectoryName(path)))
         {
             CreateDirectory(Path.GetDirectoryName(path)!);
         }
+#endif
         Directory.CreateDirectory(path);
     }
 

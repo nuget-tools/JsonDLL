@@ -20,10 +20,16 @@ namespace JsonDLL;
  * in test.cs: @include test.cs */
 public class Util
 {
+    public static bool DebugFlag = false;
     static Util()
     {
     }
     public static string FindExePath(string exe)
+    {
+        string cwd = "";
+        return FindExePath(exe, cwd);
+    }
+    public static string FindExePath(string exe, string cwd)
     {
         exe = Environment.ExpandEnvironmentVariables(exe);
         if (Path.IsPathRooted(exe))
@@ -31,7 +37,7 @@ public class Util
             if (!File.Exists(exe)) return null;
             return Path.GetFullPath(exe);
         }
-        var cwd = Directory.GetCurrentDirectory();
+        //var cwd = Directory.GetCurrentDirectory();
         var PATH = Environment.GetEnvironmentVariable("PATH") ?? "";
         PATH = $"{cwd};{PATH}";
         foreach (string test in PATH.Split(';'))
@@ -41,6 +47,11 @@ public class Util
                 return Path.GetFullPath(path);
         }
         return null;
+    }
+    public static string FindExePath(string exe, Assembly assembly)
+    {
+        string cwd = AssemblyDirectory(assembly);
+        return FindExePath(exe, cwd);
     }
     public static string AssemblyDirectory(Assembly assembly)
     {
@@ -384,8 +395,18 @@ public class Util
         String s = "";
         if (title != null) s = title + ": ";
         s += Util.ToString(x);
-        Console.Error.WriteLine(s);
-        System.Diagnostics.Debug.WriteLine(s);
+        Console.Error.WriteLine("[Log] " + s);
+        System.Diagnostics.Debug.WriteLine("[Log] " + s);
+    }
+
+    public static void Debug(dynamic x, string? title = null)
+    {
+        if (!DebugFlag) return;
+        String s = "";
+        if (title != null) s = title + ": ";
+        s += Util.ToString(x);
+        Console.Error.WriteLine("[Debug] " + s);
+        System.Diagnostics.Debug.WriteLine("[Debug] " + s);
     }
 
     public static XDocument ParseXml(string xml)

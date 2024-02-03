@@ -9,15 +9,16 @@ public static class TextEmbedder
 {
     private static string TextEmbedFromUrl(string url, long searchLimit)
     {
-        Log($"TextEmbedFromUrl(): searchLimit={searchLimit}");
+        //Log($"TextEmbedFromUrl(): searchLimit={searchLimit}");
         long endPos = -1;
+        string startTag = null;
         var phs = new PartialHTTPStream(url, 1000000);
         var phsr = new System.IO.StreamReader(phs, System.Text.Encoding.UTF8);
         phs.Seek(0, System.IO.SeekOrigin.Begin);
-        int shortLen = 1024*1024;
+        int shortLen = 1024 * 1024;
         byte[] byteArray = new byte[shortLen];
         long readLen = phs.Read(byteArray, 0, shortLen);
-        Log(readLen, "hsortResult");
+        //Log(readLen, "hsortResult");
         if (readLen >= shortLen)
         {
             if (searchLimit < 0 || searchLimit > phs.Length) searchLimit = phs.Length;
@@ -30,6 +31,7 @@ public static class TextEmbedder
             byte[] newArray = new byte[readLen];
             Array.Copy(byteArray, 0, newArray, 0, newArray.Length);
             byteArray = newArray;
+            searchLimit = byteArray.Length;
         }
         MemoryStream ms = new MemoryStream(byteArray);
         StreamReader sr = new StreamReader(ms);
@@ -40,11 +42,10 @@ public static class TextEmbedder
             string part = sr.ReadToEnd();
             if (endPos >= 0)
             {
-                string pattern = @"^\[embed\]";
-                Match m = Regex.Match(part, pattern);
-                if (m.Success)
+                //string pattern = @"^\[embed\]";
+                if (part.StartsWith(startTag))
                 {
-                    long startPos = pos + 7;
+                    long startPos = pos + startTag.Length;
                     long resultLength = endPos - startPos;
                     var result = new byte[resultLength];
                     ms.Seek(startPos, System.IO.SeekOrigin.Begin);
@@ -56,11 +57,12 @@ public static class TextEmbedder
             }
             else
             {
-                string pattern = @"^\[/embed\]\s*";
+                string pattern = @"^\[/embed(:[0-9a-zA-Z]+)?\]\s*";
                 Match m = Regex.Match(part, pattern);
                 if (m.Success)
                 {
                     endPos = pos;
+                    startTag = $"[embed{m.Groups[1].Value}]";
                 }
             }
         }
@@ -78,6 +80,7 @@ public static class TextEmbedder
                 return TextEmbedFromUrl(path, searchLimit);
             }
             long endPos = -1;
+            string startTag = null;
             var fs = System.IO.File.OpenRead(path);
             var sr = new System.IO.StreamReader(fs, System.Text.Encoding.UTF8);
             if (searchLimit < 0 || searchLimit > fs.Length) searchLimit = fs.Length;
@@ -88,11 +91,9 @@ public static class TextEmbedder
                 string part = sr.ReadToEnd();
                 if (endPos >= 0)
                 {
-                    string pattern = @"^\[embed\]";
-                    Match m = Regex.Match(part, pattern);
-                    if (m.Success)
+                    if (part.StartsWith(startTag))
                     {
-                        long startPos = pos + 7;
+                        long startPos = pos + startTag.Length;
                         long resultLength = endPos - startPos;
                         var result = new byte[resultLength];
                         fs.Seek(startPos, System.IO.SeekOrigin.Begin);
@@ -104,11 +105,12 @@ public static class TextEmbedder
                 }
                 else
                 {
-                    string pattern = @"^\[/embed\]\s*";
+                    string pattern = @"^\[/embed(:[0-9a-zA-Z]+)?\]\s*";
                     Match m = Regex.Match(part, pattern);
                     if (m.Success)
                     {
                         endPos = pos;
+                        startTag = $"[embed{m.Groups[1].Value}]";
                     }
                 }
             }
@@ -125,6 +127,7 @@ public static class TextEmbedder
     {
         long searchLimit = -1;
         long endPos = -1;
+        string startTag = null;
         var phs = new PartialHTTPStream(url, 1000000);
         var phsr = new System.IO.StreamReader(phs, System.Text.Encoding.UTF8);
         if (searchLimit < 0 || searchLimit > phs.Length) searchLimit = phs.Length;
@@ -140,11 +143,9 @@ public static class TextEmbedder
             string part = sr.ReadToEnd();
             if (endPos >= 0)
             {
-                string pattern = @"^\[embed\]";
-                Match m = Regex.Match(part, pattern);
-                if (m.Success)
+                if (part.StartsWith(startTag))
                 {
-                    long startPos = pos;
+                    //long startPos = pos;
                     long resultLength = pos;
                     var result = new byte[resultLength];
                     ms.Seek(0, System.IO.SeekOrigin.Begin);
@@ -156,11 +157,12 @@ public static class TextEmbedder
             }
             else
             {
-                string pattern = @"^\[/embed\]\s*";
+                string pattern = @"^\[/embed(:[0-9a-zA-Z]+)?\]\s*";
                 Match m = Regex.Match(part, pattern);
                 if (m.Success)
                 {
                     endPos = pos;
+                    startTag = $"[embed{m.Groups[1].Value}]";
                 }
             }
         }
@@ -183,10 +185,11 @@ public static class TextEmbedder
         {
             if (path.StartsWith("http:") || path.StartsWith("https:"))
             {
-                Log("is url");
+                //Log("is url");
                 return TextActualFromUrl(path);
             }
             long endPos = -1;
+            string startTag = null;
             var fs = System.IO.File.OpenRead(path);
             var sr = new System.IO.StreamReader(fs, System.Text.Encoding.UTF8);
             if (searchLimit < 0 || searchLimit > fs.Length) searchLimit = fs.Length;
@@ -197,11 +200,9 @@ public static class TextEmbedder
                 string part = sr.ReadToEnd();
                 if (endPos >= 0)
                 {
-                    string pattern = @"^\[embed\]";
-                    Match m = Regex.Match(part, pattern);
-                    if (m.Success)
+                    if (part.StartsWith(startTag))
                     {
-                        long startPos = pos;
+                        //long startPos = pos;
                         long resultLength = pos;
                         var result = new byte[resultLength];
                         fs.Seek(0, System.IO.SeekOrigin.Begin);
@@ -213,11 +214,12 @@ public static class TextEmbedder
                 }
                 else
                 {
-                    string pattern = @"^\[/embed\]\s*";
+                    string pattern = @"^\[/embed(:[0-9a-zA-Z]+)?\]\s*";
                     Match m = Regex.Match(part, pattern);
                     if (m.Success)
                     {
                         endPos = pos;
+                        startTag = $"[embed{m.Groups[1].Value}]";
                     }
                 }
             }

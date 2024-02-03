@@ -18,24 +18,30 @@ public class JsonAPI
     }
     public JsonAPI(string dllSpec)
     {
-#if false
-        if (System.IO.Path.IsPathRooted(dllName))
-        {
-            this.handle = LoadLibraryExW(
-                dllName,
-                IntPtr.Zero,
-                LoadLibraryFlags.LOAD_WITH_ALTERED_SEARCH_PATH
-                );
-        }
-        else
-        {
-            this.handle = LoadLibraryW(dllName);
-        }
-#else
         Util.Log(dllSpec, "dllSpec");
         string dllPath = Util.FindExePath(dllSpec);
         Util.Log(dllPath, "dllPath");
         if (dllPath is null) Environment.Exit(1);
+        this.LoadDll(dllPath);
+    }
+    public JsonAPI(string dllSpec, string cwd)
+    {
+        Util.Log(dllSpec, "dllSpec");
+        string dllPath = Util.FindExePath(dllSpec, cwd);
+        Util.Log(dllPath, "dllPath");
+        if (dllPath is null) Environment.Exit(1);
+        this.LoadDll(dllPath);
+    }
+    public JsonAPI(string dllSpec, Assembly assembly)
+    {
+        Util.Log(dllSpec, "dllSpec");
+        string dllPath = Util.FindExePath(dllSpec, assembly);
+        Util.Log(dllPath, "dllPath");
+        if (dllPath is null) Environment.Exit(1);
+        this.LoadDll(dllPath);
+    }
+    private void LoadDll(string dllPath)
+    {
         this.handle = LoadLibraryExW(
             dllPath,
             IntPtr.Zero,
@@ -43,10 +49,9 @@ public class JsonAPI
             );
         if (this.handle == IntPtr.Zero)
         {
-            Util.Log("DLL not loaded");
+            Util.Log($"DLL not loaded: {dllPath}");
             Environment.Exit(1);
         }
-#endif
         this.funcPtr = GetProcAddress(handle, "Call");
         if (this.funcPtr == IntPtr.Zero)
         {
