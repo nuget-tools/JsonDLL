@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using static JsonDLL.Util;
 
@@ -7,115 +8,131 @@ namespace JsonDLL;
 
 public static class TextEmbedder
 {
-    private static string TextEmbedFromUrl(string url, long searchLimit)
+    const long MinimumCheckLength = 8192;
+    internal class SearchResult
     {
-        //Log($"TextEmbedFromUrl(): searchLimit={searchLimit}");
-        long endPos = -1;
-        string startTag = null;
-        var phs = new PartialHTTPStream(url, 1000000);
-        var phsr = new System.IO.StreamReader(phs, System.Text.Encoding.UTF8);
-        phs.Seek(0, System.IO.SeekOrigin.Begin);
-        int shortLen = 1024 * 1024;
-        byte[] byteArray = new byte[shortLen];
-        long readLen = phs.Read(byteArray, 0, shortLen);
-        //Log(readLen, "hsortResult");
-        if (readLen >= shortLen)
-        {
-            if (searchLimit < 0 || searchLimit > phs.Length) searchLimit = phs.Length;
-            phs.Seek(phs.Length - searchLimit, System.IO.SeekOrigin.Begin);
-            byteArray = new byte[searchLimit];
-            phs.Read(byteArray, 0, (int)searchLimit);
-        }
-        else
-        {
-            byte[] newArray = new byte[readLen];
-            Array.Copy(byteArray, 0, newArray, 0, newArray.Length);
-            byteArray = newArray;
-            searchLimit = byteArray.Length;
-        }
-        MemoryStream ms = new MemoryStream(byteArray);
-        StreamReader sr = new StreamReader(ms);
-        for (long i = 0; i < searchLimit; i++)
-        {
-            long pos = ms.Length - i;
-            ms.Seek(pos, System.IO.SeekOrigin.Begin);
-            string part = sr.ReadToEnd();
-            if (endPos >= 0)
-            {
-                //string pattern = @"^\[embed\]";
-                if (part.StartsWith(startTag))
-                {
-                    long startPos = pos + startTag.Length;
-                    long resultLength = endPos - startPos;
-                    var result = new byte[resultLength];
-                    ms.Seek(startPos, System.IO.SeekOrigin.Begin);
-                    ms.Read(result, 0, result.Length);
-                    string text = System.Text.Encoding.UTF8.GetString(result).Trim();
-                    phs.Close();
-                    return text;
-                }
-            }
-            else
-            {
-                string pattern = @"^\[/embed(:[0-9a-zA-Z]+)?\]\s*";
-                Match m = Regex.Match(part, pattern);
-                if (m.Success)
-                {
-                    endPos = pos;
-                    startTag = $"[embed{m.Groups[1].Value}]";
-                }
-            }
-        }
-        //Log("Z");
-        return null;
+        public long Length { get; set; }
+        public long StartPos { get; set; }
+        public long EndPos { get; set; }
     }
-    public static string TextEmbed(string path, long searchLimit = 8192)
+    private static SearchResult CheckTailBytes(long offset, byte[] bytes)
     {
-        //Log(path, "path");
+        SearchResult result = new SearchResult() { Length = offset + bytes.Length, StartPos = -1, EndPos = -1 };
+        const string neutral = "IBM437";
+        string part = Encoding.GetEncoding(neutral).GetString(bytes);
+        string pattern = @"\[/embed(:[0-9a-zA-Z]+)?\]\s*$";
+        Match m = Regex.Match(part, pattern);
+        if (m.Success)
+        {
+            string startTag = $"[embed{m.Groups[1].Value}]";
+            string endTag = $"[/embed{m.Groups[1].Value}]";
+            result.EndPos = part.LastIndexOf(endTag);
+            if (result.EndPos >= 0)
+            {
+                int idx = part.LastIndexOf(startTag, (int)result.EndPos);
+                if (idx >= 0)
+                {
+                    result.Length = offset + idx;
+                    result.StartPos = idx + startTag.Length;
+                    long len = result.EndPos - result.StartPos;
+                    string s = part.Substring((int)result.StartPos, (int)len);
+                }
+            }
+        }
+        return result;
+    }
+
+    private static long GetLength(string path)
+    {
+        if (path.StartsWith("http:") || path.StartsWith("https:"))
+        {
+            using (var fs = new PartialHTTPStream(path, 1024 * 1024))
+            {
+                return fs.Length;
+            }
+        }
+        using (var fs = File.OpenRead(path))
+        {
+            return fs.Length;
+        }
+    }
+
+    private static byte[] GetHeadBytes(string path, long size)
+    {
+        if (path.StartsWith("http:") || path.StartsWith("https:"))
+        {
+            using (var fs = new PartialHTTPStream(path, 1024 * 1024))
+            {
+                long fileLen = fs.Length;
+                if (size > fileLen) size = fileLen;
+                byte[] result = new byte[size];
+                fs.Read(result, 0, result.Length);
+                return result;
+            }
+        }
+        using (var fs = File.OpenRead(path))
+        {
+            long fileLen = fs.Length;
+            if (size > fileLen) size = fileLen;
+            byte[] result = new byte[size];
+            fs.Read(result, 0, result.Length);
+            return result;
+        }
+    }
+    private static byte[] GetTailBytes(string path, long size)
+    {
+        if (path.StartsWith("http:") || path.StartsWith("https:"))
+        {
+            using (var fs = new PartialHTTPStream(path, 1024 * 1024))
+            {
+                long fileLen = fs.Length;
+                if (size > fileLen) size = fileLen;
+                long pos = fileLen - size;
+                byte[] result = new byte[size];
+                fs.Seek(pos, SeekOrigin.Begin);
+                fs.Read(result, 0, result.Length);
+                return result;
+            }
+        }
+        using (var fs = File.OpenRead(path))
+        {
+            long fileLen = fs.Length;
+            if (size > fileLen) size = fileLen;
+            long pos = fileLen - size;
+            byte[] result = new byte[size];
+            fs.Seek(pos, SeekOrigin.Begin);
+            fs.Read(result, 0, result.Length);
+            return result;
+        }
+    }
+    public static string TextEmbed(string path)
+    {
         try
         {
-            if (path.StartsWith("http:") || path.StartsWith("https:"))
+            long fileLen = GetLength(path);
+            long checkLen = MinimumCheckLength;
+            while (true)
             {
-                //Log("is url");
-                return TextEmbedFromUrl(path, searchLimit);
-            }
-            long endPos = -1;
-            string startTag = null;
-            var fs = System.IO.File.OpenRead(path);
-            var sr = new System.IO.StreamReader(fs, System.Text.Encoding.UTF8);
-            if (searchLimit < 0 || searchLimit > fs.Length) searchLimit = fs.Length;
-            for (long i = 0; i < searchLimit; i++)
-            {
-                long pos = fs.Length - i;
-                fs.Seek(pos, System.IO.SeekOrigin.Begin);
-                string part = sr.ReadToEnd();
-                if (endPos >= 0)
+                if (checkLen > fileLen) checkLen = fileLen;
                 {
-                    if (part.StartsWith(startTag))
-                    {
-                        long startPos = pos + startTag.Length;
-                        long resultLength = endPos - startPos;
-                        var result = new byte[resultLength];
-                        fs.Seek(startPos, System.IO.SeekOrigin.Begin);
-                        fs.Read(result, 0, result.Length);
-                        string text = System.Text.Encoding.UTF8.GetString(result).Trim();
-                        fs.Close();
-                        return text;
-                    }
+
                 }
-                else
+                byte[] check = GetTailBytes(path, checkLen);
+                SearchResult checkResult = CheckTailBytes(fileLen - checkLen, check);
+                if (checkResult.EndPos < 0) return null;
+                if (checkResult.StartPos >= 0)
                 {
-                    string pattern = @"^\[/embed(:[0-9a-zA-Z]+)?\]\s*";
-                    Match m = Regex.Match(part, pattern);
-                    if (m.Success)
-                    {
-                        endPos = pos;
-                        startTag = $"[embed{m.Groups[1].Value}]";
-                    }
+                    long len = checkResult.EndPos - checkResult.StartPos;
+                    byte[] result = new byte[len];
+                    Array.Copy(check, checkResult.StartPos, result, 0, len);
+                    return Encoding.UTF8.GetString(result).Trim();
                 }
+                if (checkLen >= fileLen)
+                {
+                    return null;
+                }
+                checkLen *= 2;
             }
-            fs.Close();
-            return null;
         }
         catch (Exception e)
         {
@@ -123,115 +140,41 @@ public static class TextEmbedder
             return null;
         }
     }
-    private static string TextActualFromUrl(string url)
+    public static long SizeActual(string path)
     {
-        long searchLimit = -1;
-        long endPos = -1;
-        string startTag = null;
-        var phs = new PartialHTTPStream(url, 1000000);
-        var phsr = new System.IO.StreamReader(phs, System.Text.Encoding.UTF8);
-        if (searchLimit < 0 || searchLimit > phs.Length) searchLimit = phs.Length;
-        phs.Seek(phs.Length - searchLimit, System.IO.SeekOrigin.Begin);
-        byte[] byteArray = new byte[searchLimit];
-        phs.Read(byteArray, 0, (int)searchLimit);
-        MemoryStream ms = new MemoryStream(byteArray);
-        StreamReader sr = new StreamReader(ms);
-        for (long i = 0; i < searchLimit; i++)
+        try
         {
-            long pos = ms.Length - i;
-            ms.Seek(pos, System.IO.SeekOrigin.Begin);
-            string part = sr.ReadToEnd();
-            if (endPos >= 0)
+            long fileLen = GetLength(path);
+            long checkLen = MinimumCheckLength;
+            while (true)
             {
-                if (part.StartsWith(startTag))
+                if (checkLen > fileLen) checkLen = fileLen;
+                byte[] check = GetTailBytes(path, checkLen);
+                SearchResult checkResult = CheckTailBytes(fileLen - checkLen, check);
+                if (checkResult.EndPos < 0) return checkResult.Length;
+                if (checkResult.StartPos >= 0)
                 {
-                    //long startPos = pos;
-                    long resultLength = pos;
-                    var result = new byte[resultLength];
-                    ms.Seek(0, System.IO.SeekOrigin.Begin);
-                    ms.Read(result, 0, result.Length);
-                    string text = System.Text.Encoding.UTF8.GetString(result);
-                    phs.Close();
-                    return text;
+                    return checkResult.Length;
                 }
-            }
-            else
-            {
-                string pattern = @"^\[/embed(:[0-9a-zA-Z]+)?\]\s*";
-                Match m = Regex.Match(part, pattern);
-                if (m.Success)
+                if (checkLen >= fileLen)
                 {
-                    endPos = pos;
-                    startTag = $"[embed{m.Groups[1].Value}]";
+                    return checkResult.Length;
                 }
+                checkLen *= 2;
             }
         }
+        catch (Exception e)
         {
-            var result = new byte[phs.Length];
-            phs.Seek(0, System.IO.SeekOrigin.Begin);
-            phs.Read(result, 0, result.Length);
-            string text = System.Text.Encoding.UTF8.GetString(result);
-            phs.Close();
-            return text;
-
-            //return null;
+            Log(e.ToString());
+            return 0;
         }
     }
     public static string TextActual(string path)
     {
-        //Log(path, "path");
-        long searchLimit = -1;
         try
         {
-            if (path.StartsWith("http:") || path.StartsWith("https:"))
-            {
-                //Log("is url");
-                return TextActualFromUrl(path);
-            }
-            long endPos = -1;
-            string startTag = null;
-            var fs = System.IO.File.OpenRead(path);
-            var sr = new System.IO.StreamReader(fs, System.Text.Encoding.UTF8);
-            if (searchLimit < 0 || searchLimit > fs.Length) searchLimit = fs.Length;
-            for (long i = 0; i < searchLimit; i++)
-            {
-                long pos = fs.Length - i;
-                fs.Seek(pos, System.IO.SeekOrigin.Begin);
-                string part = sr.ReadToEnd();
-                if (endPos >= 0)
-                {
-                    if (part.StartsWith(startTag))
-                    {
-                        //long startPos = pos;
-                        long resultLength = pos;
-                        var result = new byte[resultLength];
-                        fs.Seek(0, System.IO.SeekOrigin.Begin);
-                        fs.Read(result, 0, result.Length);
-                        string text = System.Text.Encoding.UTF8.GetString(result);
-                        fs.Close();
-                        return text;
-                    }
-                }
-                else
-                {
-                    string pattern = @"^\[/embed(:[0-9a-zA-Z]+)?\]\s*";
-                    Match m = Regex.Match(part, pattern);
-                    if (m.Success)
-                    {
-                        endPos = pos;
-                        startTag = $"[embed{m.Groups[1].Value}]";
-                    }
-                }
-            }
-            {
-                var result = new byte[fs.Length];
-                fs.Seek(0, System.IO.SeekOrigin.Begin);
-                fs.Read(result, 0, result.Length);
-                string text = System.Text.Encoding.UTF8.GetString(result);
-                fs.Close();
-                return text;
-                //return null;
-            }
+            long size = SizeActual(path);
+            return Encoding.UTF8.GetString(GetHeadBytes(path, size));
         }
         catch (Exception e)
         {
