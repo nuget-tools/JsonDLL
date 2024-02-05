@@ -23,18 +23,13 @@ public class MSys2
             ZipFile.ExtractToDirectory(zipPath, MSys2Dir);
             Util.Log($"Extracting to {MSys2Dir}...Done");
         }
+        var PATH = $"{MSys2Dir}\\usr\\bin;{Environment.GetEnvironmentVariable("PATH")}";
+        Environment.SetEnvironmentVariable("PATH", PATH);
     }
     public static void Initialize()
     {
         ;
     }
-#if false
-    public static void Test01()
-    {
-        int exitCode = RunBashScript("set -uvx;set -e;pwd;sleep 1");
-        Util.Log(exitCode, "exitCode");
-    }
-#endif
     public static int RunBashScript(string script)
     {
         var PATH = $"{MSys2Dir}\\usr\\bin;{Environment.GetEnvironmentVariable("PATH")}";
@@ -63,6 +58,28 @@ public class MSys2
         child.WaitForExit();
         child.CancelOutputRead();
         child.CancelErrorRead();
+        return child.ExitCode;
+    }
+    public static int RunBashScript2(string script)
+    {
+        string scriptPath = Path.Combine(Dirs.GetTempPath(), "tmp.sh");
+        Util.Log(scriptPath, "scriptPath");
+        Dirs.PrepareForFile(scriptPath);
+        File.WriteAllText(scriptPath, script);
+        //var PATH = $"{MSys2Dir}\\usr\\bin;{Environment.GetEnvironmentVariable("PATH")}";
+        //Environment.SetEnvironmentVariable("PATH", PATH);
+        var p_info = new ProcessStartInfo
+        {
+            CreateNoWindow = false,
+            WindowStyle = ProcessWindowStyle.Normal,
+            UseShellExecute = true,
+            FileName = "bash.exe",
+            Arguments = scriptPath,
+        };
+        //p_info.EnvironmentVariables["PATH"] = PATH;
+        Process child = Process.Start(p_info);
+        child.WaitForExit();
+        File.Delete(scriptPath);
         return child.ExitCode;
     }
 }
