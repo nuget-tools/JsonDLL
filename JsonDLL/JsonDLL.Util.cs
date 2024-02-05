@@ -26,6 +26,24 @@ public class Util
     static Util()
     {
     }
+    public static void DownloadBinaryFromUrl(string url, string destinationPath)
+    {
+        Dirs.PrepareForFile(destinationPath);
+        WebRequest objRequest = System.Net.HttpWebRequest.Create(url);
+        var objResponse = objRequest.GetResponse();
+        byte[] buffer = new byte[32768];
+        using (Stream input = objResponse.GetResponseStream())
+        {
+            using (FileStream output = new FileStream(destinationPath, FileMode.CreateNew))
+            {
+                int bytesRead;
+                while ((bytesRead = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    output.Write(buffer, 0, bytesRead);
+                }
+            }
+        }
+    }
     public static List<string> GetMacAddressList()
     {
         var list = NetworkInterface
@@ -70,15 +88,14 @@ public class Util
     }
     public static bool LaunchProcess(string exePath, string[] args, Dictionary<string, string>? vars = null)
     {
-        string text = "";
+        string argList = "";
         for (int i = 0; i < args.Length; i++)
         {
-            if (i > 0)
-            {
-                text += " ";
-            }
-
-            text = text + "\"" + args[i] + "\"";
+            if (i > 0) argList += " ";
+            if (args[i].Contains(" "))
+                argList += $"\"{args[i]}\"";
+            else
+                argList += args[i];
         }
         Process process = new Process();
         process.StartInfo.RedirectStandardOutput = true;
@@ -86,7 +103,7 @@ public class Util
         process.StartInfo.UseShellExecute = false;
         process.StartInfo.CreateNoWindow = true;
         process.StartInfo.FileName = exePath;
-        process.StartInfo.Arguments = text;
+        process.StartInfo.Arguments = argList;
         if (vars != null)
         {
             foreach (string key in vars.Keys)
@@ -175,7 +192,10 @@ public class Util
         for (int i = 0; i < args.Length; i++)
         {
             if (i > 0) argList += " ";
-            argList += $"\"{args[i]}\"";
+            if (args[i].Contains(" "))
+                argList += $"\"{args[i]}\"";
+            else
+                argList += args[i];
         }
         Process process = new Process();
         process.StartInfo.RedirectStandardOutput = true;
