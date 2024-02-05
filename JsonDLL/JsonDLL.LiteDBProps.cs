@@ -15,9 +15,9 @@ public class LiteDBProps
     private string filePath = null;
     private LiteDatabase connection = null;
     ILiteCollection<Prop> collection = null;
-    public LiteDBProps(string orgName, string appNam)
+    public LiteDBProps(DirectoryInfo di)
     {
-        this.filePath = Path.Combine(Dirs.ProfilePath(orgName, appNam), "settings.litedb");
+        this.filePath = Path.Combine(di.FullName, "properties.litedb");
         Dirs.PrepareForFile(this.filePath);
         this.connection = new LiteDatabase(new ConnectionString(this.filePath)
         {
@@ -27,7 +27,9 @@ public class LiteDBProps
         // Nameをユニークインデックスにする
         this.collection.EnsureIndex(x => x.Name, true);
     }
-
+    public LiteDBProps(string orgName, string appNam) : this(new DirectoryInfo(Dirs.ProfilePath(orgName, appNam)))
+    {
+    }
     public dynamic? Get(string name)
     {
         this.connection.BeginTrans();
@@ -44,6 +46,7 @@ public class LiteDBProps
         {
             result = new Prop { Name = name, Data = ToObject(data) };
             this.collection.Insert(result);
+            this.connection.Commit();
             return;
         }
         result.Data = ToObject(data);
