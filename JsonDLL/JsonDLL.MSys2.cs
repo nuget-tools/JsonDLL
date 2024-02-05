@@ -1,10 +1,5 @@
-﻿using NetUV.Core.Logging;
-using System;
-using System.Collections.Generic;
+﻿using System.Diagnostics;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JsonDLL;
 
@@ -33,13 +28,41 @@ public class MSys2
     {
         ;
     }
+#if false
     public static void Test01()
     {
-        var PATH=$"{MSys2Dir}\\usr\\bin;{Environment.GetEnvironmentVariable("PATH")}";
-        //Util.Log(PATH, "PATH");
-        var env = new Dictionary<string, string>();
-        env["PATH"] = PATH;
-        //Util.RunToConsole("cmd.exe", new string[] { "/c", "start", "bash.exe", "-c", "set -uvx;set -e;pwd;sleep 3600" }, env);
-        Util.LaunchProcess("cmd.exe", new string[] { "/c", "start", "bash.exe", "-c", "set -uvx;set -e;pwd;sleep 3600" }, env);
+        int exitCode = RunBashScript("set -uvx;set -e;pwd;sleep 1");
+        Util.Log(exitCode, "exitCode");
+    }
+#endif
+    public static int RunBashScript(string script)
+    {
+        var PATH = $"{MSys2Dir}\\usr\\bin;{Environment.GetEnvironmentVariable("PATH")}";
+        var p_info = new ProcessStartInfo
+        {
+            CreateNoWindow = true,
+            //WindowStyle = ProcessWindowStyle.Normal,
+            UseShellExecute = false,
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            FileName = "bash.exe",
+            Arguments = "",
+        };
+        p_info.EnvironmentVariables["PATH"] = PATH;
+        Process child = Process.Start(p_info);
+        child.OutputDataReceived += (sender, e) => { Console.WriteLine(e.Data); };
+        child.ErrorDataReceived += (sender, e) => { Console.Error.WriteLine(e.Data); };
+        using (var stdin = child.StandardInput)
+        {
+            stdin.Write(script);
+        }
+        Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e) { child.Kill(); };
+        child.BeginOutputReadLine();
+        child.BeginErrorReadLine();
+        child.WaitForExit();
+        child.CancelOutputRead();
+        child.CancelErrorRead();
+        return child.ExitCode;
     }
 }
