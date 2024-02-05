@@ -147,12 +147,13 @@ public class Util
     }
     public static string FindExePath(string exe, Assembly assembly)
     {
+        int bit = IntPtr.Size * 8;
         string cwd = AssemblyDirectory(assembly);
-        string result = FindExePath(exe, cwd);
+        string result = FindExePath(exe, $"{cwd}\\{bit}bit");
         if (result == null)
         {
             cwd = Path.Combine(cwd, "assets");
-            result = FindExePath(exe, cwd);
+            result = FindExePath(exe, $"{cwd}\\{bit}bit");
         }
         return result;
     }
