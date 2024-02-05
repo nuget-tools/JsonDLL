@@ -8,23 +8,22 @@ public class MSys2
     private static string MSys2Dir;
     static MSys2()
     {
-        string zipPath = Path.Combine(Dirs.ProfilePath(".JsonDLL", ".msys2"), "msys2-base-x86_64-20231026.zip");
+        string baseName = "msys2-base-x86_64-20240113";
+        string zipPath = Path.Combine(Dirs.ProfilePath(".JsonDLL", ".msys2"), $"{baseName}.zip");
         if (!File.Exists(zipPath))
         {
             //Dirs.PrepareForFile(zipPath);
             Util.Log($"Donloading to {zipPath}...");
-            Util.DownloadBinaryFromUrl("https://github.com/nuget-tools/JsonDLL.Assets/releases/download/64bit/msys2-base-x86_64-20231026.zip", zipPath);
+            Util.DownloadBinaryFromUrl($"https://github.com/nuget-tools/JsonDLL.Assets/releases/download/64bit/{baseName}.zip", zipPath);
             Util.Log($"Donloading to {zipPath}...Done");
         }
-        MSys2Dir = Path.Combine(Dirs.ProfilePath(".JsonDLL", ".msys2"), "msys2-base-x86_64-20231026");
+        MSys2Dir = Path.Combine(Dirs.ProfilePath(".JsonDLL", ".msys2"), $"{baseName}");
         if (!Directory.Exists(MSys2Dir))
         {
             Util.Log($"Extracting to {MSys2Dir}...");
             ZipFile.ExtractToDirectory(zipPath, MSys2Dir);
             Util.Log($"Extracting to {MSys2Dir}...Done");
         }
-        var PATH = $"{MSys2Dir}\\usr\\bin;{Environment.GetEnvironmentVariable("PATH")}";
-        Environment.SetEnvironmentVariable("PATH", PATH);
     }
     public static void Initialize()
     {
@@ -32,42 +31,14 @@ public class MSys2
     }
     public static int RunBashScript(string script)
     {
-        var PATH = $"{MSys2Dir}\\usr\\bin;{Environment.GetEnvironmentVariable("PATH")}";
-        var p_info = new ProcessStartInfo
-        {
-            CreateNoWindow = true,
-            //WindowStyle = ProcessWindowStyle.Normal,
-            UseShellExecute = false,
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            FileName = "bash.exe",
-            Arguments = "",
-        };
-        p_info.EnvironmentVariables["PATH"] = PATH;
-        Process child = Process.Start(p_info);
-        child.OutputDataReceived += (sender, e) => { Console.WriteLine(e.Data); };
-        child.ErrorDataReceived += (sender, e) => { Console.Error.WriteLine(e.Data); };
-        using (var stdin = child.StandardInput)
-        {
-            stdin.Write(script);
-        }
-        Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e) { child.Kill(); };
-        child.BeginOutputReadLine();
-        child.BeginErrorReadLine();
-        child.WaitForExit();
-        child.CancelOutputRead();
-        child.CancelErrorRead();
-        return child.ExitCode;
-    }
-    public static int RunBashScript2(string script)
-    {
+        Util.ProcessMutex.WaitOne();
+        string ORIG_PATH = Environment.GetEnvironmentVariable("PATH");
+        var PATH = $"{MSys2Dir}\\usr\\bin;{ORIG_PATH}";
+        Environment.SetEnvironmentVariable("PATH", PATH);
         string scriptPath = Path.Combine(Dirs.GetTempPath(), "tmp.sh");
         Util.Log(scriptPath, "scriptPath");
         Dirs.PrepareForFile(scriptPath);
         File.WriteAllText(scriptPath, script);
-        //var PATH = $"{MSys2Dir}\\usr\\bin;{Environment.GetEnvironmentVariable("PATH")}";
-        //Environment.SetEnvironmentVariable("PATH", PATH);
         var p_info = new ProcessStartInfo
         {
             CreateNoWindow = false,
@@ -76,8 +47,9 @@ public class MSys2
             FileName = "bash.exe",
             Arguments = scriptPath,
         };
-        //p_info.EnvironmentVariables["PATH"] = PATH;
         Process child = Process.Start(p_info);
+        Util.ProcessMutex.ReleaseMutex();
+        Environment.SetEnvironmentVariable("PARH", ORIG_PATH);
         child.WaitForExit();
         File.Delete(scriptPath);
         return child.ExitCode;

@@ -23,6 +23,7 @@ namespace JsonDLL;
 public class Util
 {
     public static bool DebugFlag = false;
+    public static System.Threading.Mutex ProcessMutex = new System.Threading.Mutex(false, "ProcessMutex");
     static Util()
     {
     }
@@ -88,6 +89,7 @@ public class Util
     }
     public static bool LaunchProcess(string exePath, string[] args, Dictionary<string, string>? vars = null)
     {
+        ProcessMutex.WaitOne();
         string argList = "";
         for (int i = 0; i < args.Length; i++)
         {
@@ -111,7 +113,9 @@ public class Util
                 process.StartInfo.EnvironmentVariables[key] = vars[key];
             }
         }
-        return process.Start();
+        bool result = process.Start();
+        ProcessMutex.ReleaseMutex();
+        return result;
     }
     public static void Beep()
     {
@@ -188,6 +192,7 @@ public class Util
     }
     public static int RunToConsole(string exePath, string[] args, Dictionary<string, string>? vars = null)
     {
+        ProcessMutex.WaitOne();
         string argList = "";
         for (int i = 0; i < args.Length; i++)
         {
@@ -198,6 +203,7 @@ public class Util
                 argList += args[i];
         }
         Process process = new Process();
+        ProcessMutex.ReleaseMutex();
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
         process.StartInfo.UseShellExecute = false;
