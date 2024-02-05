@@ -5,7 +5,8 @@ namespace JsonDLL;
 
 public class MSys2
 {
-    private static string MSys2Dir;
+    public static string MSys2Dir;
+    public static string MSys2Bin;
     static MSys2()
     {
         string baseName = "msys2-base-x86_64-20240113";
@@ -24,6 +25,7 @@ public class MSys2
             ZipFile.ExtractToDirectory(zipPath, MSys2Dir);
             Util.Log($"Extracting to {MSys2Dir}...Done");
         }
+        MSys2Bin = Path.Combine(MSys2Dir, "usr\\bin");
     }
     public static void Initialize()
     {

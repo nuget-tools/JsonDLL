@@ -148,7 +148,13 @@ public class Util
     public static string FindExePath(string exe, Assembly assembly)
     {
         string cwd = AssemblyDirectory(assembly);
-        return FindExePath(exe, cwd);
+        string result = FindExePath(exe, cwd);
+        if (result == null)
+        {
+            cwd = Path.Combine(cwd, "assets");
+            result = FindExePath(exe, cwd);
+        }
+        return result;
     }
     public static string AssemblyDirectory(Assembly assembly)
     {
