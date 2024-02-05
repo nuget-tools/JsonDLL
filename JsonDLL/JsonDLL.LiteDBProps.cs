@@ -30,12 +30,15 @@ public class LiteDBProps
 
     public dynamic? Get(string name)
     {
+        this.connection.BeginTrans();
         var result = this.collection.Find(x => x.Name == name).FirstOrDefault();
+        this.connection.Commit();
         if (result == null) return null;
         return FromObject(result.Data);
     }
     public void Put(string name, dynamic? data)
     {
+        this.connection.BeginTrans();
         var result = this.collection.Find(x => x.Name == name).FirstOrDefault();
         if (result == null)
         {
@@ -45,6 +48,7 @@ public class LiteDBProps
         }
         result.Data = ToObject(data);
         this.collection.Update(result);
+        this.connection.Commit();
     }
 
 }
