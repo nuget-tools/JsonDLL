@@ -48,8 +48,8 @@ public class MSys2
             Arguments = scriptPath,
         };
         Process child = Process.Start(p_info);
-        Util.ProcessMutex.ReleaseMutex();
         Environment.SetEnvironmentVariable("PARH", ORIG_PATH);
+        Util.ProcessMutex.ReleaseMutex();
         child.WaitForExit();
         File.Delete(scriptPath);
         return child.ExitCode;
