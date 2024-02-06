@@ -1,7 +1,4 @@
-﻿using Espresso3389.HttpStream;
-using System;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using static JsonDLL.Util;
 
@@ -10,6 +7,7 @@ namespace JsonDLL;
 public static class TextEmbedder
 {
     const long MinimumCheckLength = 8192;
+    //const long MinimumCheckLength = 256;
     internal class SearchResult
     {
         public long Length { get; set; }
@@ -47,17 +45,10 @@ public static class TextEmbedder
     {
         if (path.StartsWith("http:") || path.StartsWith("https:"))
         {
-#if false
-            using (var fs = new HttpStream(new Uri(path)))
-            {
-                return fs.Length;
-            }
-#else
             using (var fs = new PartialHTTPStream(path))
             {
                 return fs.Length;
             }
-#endif
         }
         using (var fs = File.OpenRead(path))
         {
@@ -69,16 +60,6 @@ public static class TextEmbedder
     {
         if (path.StartsWith("http:") || path.StartsWith("https:"))
         {
-#if false
-            using (var fs = new HttpStream(new Uri(path)))
-            {
-                long fileLen = fs.Length;
-                if (size > fileLen) size = fileLen;
-                byte[] result = new byte[size];
-                fs.Read(result, 0, result.Length);
-                return result;
-            }
-#else
             using (var fs = new PartialHTTPStream(path))
             {
                 long fileLen = fs.Length;
@@ -87,7 +68,6 @@ public static class TextEmbedder
                 fs.Read(result, 0, result.Length);
                 return result;
             }
-#endif
         }
         using (var fs = File.OpenRead(path))
         {
