@@ -14,8 +14,8 @@ namespace JsonDLL;
 
 class PartialHTTPStream : Stream, IDisposable
 {
-    Stream stream;
-    WebResponse resp;
+    Stream stream = null;
+    WebResponse resp = null;
 
     public string Url { get; private set; }
     public override bool CanRead { get { return true; } }
