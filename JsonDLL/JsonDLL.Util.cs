@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.IO;
+﻿using System.Reflection;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -9,8 +7,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using Newtonsoft.Json.Linq;
 using System.Text;
-using System.Threading;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Media;
 using System.Net.NetworkInformation;
@@ -26,6 +22,20 @@ public class Util
     public static System.Threading.Mutex ProcessMutex = new System.Threading.Mutex(false, "ProcessMutex");
     static Util()
     {
+    }
+    public static void AllocConsole()
+    {
+        WinConsole.Initialize();
+    }
+
+    public static void FreeConsole()
+    {
+        WinConsole.Deinitialize();
+    }
+    public static void ReallocConsole()
+    {
+        FreeConsole();
+        AllocConsole();
     }
     public static void DownloadBinaryFromUrl(string url, string destinationPath)
     {
