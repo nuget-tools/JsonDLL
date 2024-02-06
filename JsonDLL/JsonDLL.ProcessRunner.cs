@@ -10,7 +10,7 @@ namespace JsonDLL;
 
 public class ProcessRunner
 {
-    static JsonAPI API = null;
+    public static JsonAPI API = null;
     //static SynchronizationContext syncContext = SynchronizationContext.Current;
     //static System.Threading.Timer Timer = null;
     //static Form Form = new Form();
@@ -52,9 +52,9 @@ public class ProcessRunner
         int result = (int)API.CallOne("run_process", new object[] { windowed, exePath, args, cwd, env });
         return result;
     }
-    public static bool LaunchProcess(bool windowed, string exePath, string[] args, string cwd = "", Dictionary<string, string> env = null)
+    public static bool LaunchProcess(bool windowed, string exePath, string[] args, string cwd = "", Dictionary<string, string> env = null, string fileToDelete = "")
     {
-        bool result = (bool)API.CallOne("launch_process", new object[] { windowed, exePath, args, cwd, env });
+        bool result = (bool)API.CallOne("launch_process", new object[] { windowed, exePath, args, cwd, env, fileToDelete });
         return result;
     }
 }

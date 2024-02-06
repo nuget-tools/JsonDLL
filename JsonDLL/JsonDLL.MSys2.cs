@@ -74,15 +74,11 @@ public class MSys2
     {
         string bashExe = Path.Combine(MSys2.MSys2Bin, "bash.exe");
         string tempFile = Path.GetTempFileName();
+        //string tempFile = @"D:\temp.sh";
         File.WriteAllText(tempFile, script);
         string PATH = Environment.GetEnvironmentVariable("PATH");
         PATH = MSys2.MSys2Bin + ";" + PATH;
-        bool result = ProcessRunner.LaunchProcess(windowed, bashExe, new string[] { tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH } });
-        //File.Delete(tempFile);
-        if (!NativeMethods.MoveFileEx(tempFile, null, MoveFileFlags.DelayUntilReboot))
-        {
-            Console.Error.WriteLine($"Unable to schedule '{tempFile}' for deletion");
-        }
+        bool result = ProcessRunner.LaunchProcess(windowed, bashExe, new string[] { tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH }}, tempFile);
         return result;
     }
     [Flags]
