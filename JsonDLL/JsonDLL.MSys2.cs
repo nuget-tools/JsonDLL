@@ -31,6 +31,7 @@ public class MSys2
     {
         ;
     }
+#if false
     public static int RunBashScript(string script)
     {
         Util.ProcessMutex.WaitOne();
@@ -55,5 +56,17 @@ public class MSys2
         child.WaitForExit();
         File.Delete(scriptPath);
         return child.ExitCode;
+    }
+#endif
+    public static int RunBashScript(bool windowed, string script, string cwd = "")
+    {
+        string bashExe = Path.Combine(MSys2.MSys2Bin, "bash.exe");
+        string tempFile = Path.GetTempFileName();
+        File.WriteAllText(tempFile, script);
+        string PATH = Environment.GetEnvironmentVariable("PATH");
+        PATH = MSys2.MSys2Bin + ";" + PATH;
+        int result = ProcessRunner.RunProcess(windowed, bashExe, new string[] { tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH } });
+        File.Delete(tempFile);
+        return result;
     }
 }

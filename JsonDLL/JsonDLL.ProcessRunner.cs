@@ -44,4 +44,9 @@ public class ProcessRunner
         int result = (int)API.CallOne("run_process", new object[] { windowed, exePath, args, cwd, env });
         return result;
     }
+    public static bool LaunchProcess(bool windowed, string exePath, string[] args, string cwd = "", Dictionary<string, string> env = null)
+    {
+        bool result = (bool)API.CallOne("launch_process", new object[] { windowed, exePath, args, cwd, env });
+        return result;
+    }
 }
