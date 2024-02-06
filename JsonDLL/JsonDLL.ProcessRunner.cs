@@ -11,8 +11,12 @@ namespace JsonDLL;
 public class ProcessRunner
 {
     static JsonAPI API = null;
+    //static SynchronizationContext syncContext = SynchronizationContext.Current;
+    //static System.Threading.Timer Timer = null;
+    //static Form Form = new Form();
     static ProcessRunner()
     {
+        SynchronizationContext syncContext = SynchronizationContext.Current;
         int bit = IntPtr.Size * 8;
         var dir = Dirs.ProfilePath("JavaCommons Technologies", "JsonDLL");
         dir = Path.Combine(dir, $"x{bit}");
@@ -38,6 +42,10 @@ public class ProcessRunner
     public static void Initialize()
     {
         ;
+    }
+    public static void HandleEvents()
+    {
+        API.CallOne("process_events", null);
     }
     public static int RunProcess(bool windowed, string exePath, string[] args, string cwd = "", Dictionary<string, string> env = null)
     {
