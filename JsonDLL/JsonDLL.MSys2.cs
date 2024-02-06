@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
 
 namespace JsonDLL;
 
@@ -68,5 +69,40 @@ public class MSys2
         int result = ProcessRunner.RunProcess(windowed, bashExe, new string[] { tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH } });
         File.Delete(tempFile);
         return result;
+    }
+    public static bool LaunchBashScript(bool windowed, string script, string cwd = "")
+    {
+        string bashExe = Path.Combine(MSys2.MSys2Bin, "bash.exe");
+        string tempFile = Path.GetTempFileName();
+        File.WriteAllText(tempFile, script);
+        string PATH = Environment.GetEnvironmentVariable("PATH");
+        PATH = MSys2.MSys2Bin + ";" + PATH;
+        bool result = ProcessRunner.LaunchProcess(windowed, bashExe, new string[] { tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH } });
+        //File.Delete(tempFile);
+        if (!NativeMethods.MoveFileEx(tempFile, null, MoveFileFlags.DelayUntilReboot))
+        {
+            Console.Error.WriteLine($"Unable to schedule '{tempFile}' for deletion");
+        }
+        return result;
+    }
+    [Flags]
+    internal enum MoveFileFlags
+    {
+        None = 0,
+        ReplaceExisting = 1,
+        CopyAllowed = 2,
+        DelayUntilReboot = 4,
+        WriteThrough = 8,
+        CreateHardlink = 16,
+        FailIfNotTrackable = 32,
+    }
+
+    internal static class NativeMethods
+    {
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern bool MoveFileEx(
+            string lpExistingFileName,
+            string lpNewFileName,
+            MoveFileFlags dwFlags);
     }
 }
