@@ -4,11 +4,46 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System;
 using System.Text;
+using System.Security.Cryptography;
+using static JsonDLL.JsonAPI;
 
 namespace JsonDLL;
 
 internal static class WinConsole
 {
+    delegate void proto_AfterAllocConsole();
+    static proto_AfterAllocConsole AfterAllocConsole;
+    static WinConsole()
+    {
+        SynchronizationContext syncContext = SynchronizationContext.Current;
+        int bit = IntPtr.Size * 8;
+        var dir = Dirs.ProfilePath("JavaCommons Technologies", "JsonDLL");
+        dir = Path.Combine(dir, $"x{bit}");
+        var dllBytes = Util.ResourceAsBytes(typeof(ProcessRunner).Assembly, $"JsonDLL:AfterAllocConsole-x{bit}.dll");
+        SHA256 crypto = new SHA256CryptoServiceProvider();
+        byte[] hashValue = crypto.ComputeHash(dllBytes);
+        string sha256 = String.Join("", hashValue.Select(x => x.ToString("x2")).ToArray());
+        string dllName = $"AfterAllocConsole-{sha256}.dll";
+        var dllPath = Path.Combine(dir, dllName);
+        if (File.Exists(dllPath))
+        {
+            Util.Log($"{dllPath} is installed");
+        }
+        else
+        {
+            Dirs.PrepareForFile(dllPath);
+            File.WriteAllBytes(dllPath, dllBytes);
+            Util.Log($"{dllPath} has been written");
+        }
+        Util.Log($"Loading {dllPath}...");
+        IntPtr handle = LoadLibraryExW(
+            dllPath,
+            IntPtr.Zero,
+            LoadLibraryFlags.LOAD_WITH_ALTERED_SEARCH_PATH
+            );
+        IntPtr funcPtr = GetProcAddress(handle, "AfterAllocConsole");
+        AfterAllocConsole = (proto_AfterAllocConsole)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(proto_AfterAllocConsole));
+    }
     static public void Initialize(bool alwaysCreateNewConsole = true)
     {
         bool consoleAttached = true;
@@ -31,6 +66,9 @@ internal static class WinConsole
         var stderr = new StreamWriter(Console.OpenStandardError(), Encoding.Default);
         stderr.AutoFlush = true;
         Console.SetError(stderr);
+#if true
+        AfterAllocConsole();
+#endif
     }
 
     static public void Deinitialize()
@@ -42,6 +80,15 @@ internal static class WinConsole
             FreeConsole();
         }
     }
+
+#if false
+    static FileStream CreateFileStream(string name, uint desAccess, uint shareMode, FileAccess fileAccess)
+    {
+        var fileHandle = CreateFileW(name, desAccess, shareMode, 0, (uint)FileMode.Open, (uint)FileAttributes.Normal, 0);
+        var file = new SafeFileHandle(fileHandle, true);
+        return !file.IsInvalid ? new FileStream(file, fileAccess) : null;
+    }
+#endif
 
     #region Win API Functions and Constants
     [DllImport("kernel32.dll",
@@ -63,5 +110,17 @@ internal static class WinConsole
 
     private const UInt32 ERROR_ACCESS_DENIED = 5;
     private const UInt32 ATTACH_PARRENT = 0xFFFFFFFF;
-    #endregion
+#if false
+    const uint
+        GENERIC_WRITE = 0x40000000,
+        GENERIC_READ = 0x80000000,
+        FILE_SHARE_READ = 1,
+        FILE_SHARE_WRITE = 2;
+    [DllImport("kernel32.dll",
+        CharSet = CharSet.Auto,
+        CallingConvention = CallingConvention.StdCall)]
+    public static extern
+    nint CreateFileW(string fileName, uint desAccess, uint shareMode, nint securityAttb, uint creationDispose, uint flagsAndAttb, nint templateFile);
+#endif
+#endregion
 }

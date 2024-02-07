@@ -5,6 +5,9 @@ cwd=`pwd`
 ts=`date "+%Y.%m%d.%H%M.%S"`
 version="${ts}"
 
+cd $cwd
+g++ -shared -o JsonDLL/AfterAllocConsole-x64.dll AfterAllocConsole.cpp  -static
+
 cd $cwd/JsonDLL
 sed -i -e "s/<Version>.*<\/Version>/<Version>${version}<\/Version>/g" JsonDLL.csproj
 rm -rf obj bin
