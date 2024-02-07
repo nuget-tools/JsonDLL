@@ -50,5 +50,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="*.dll" />
+		<EmbeddedResource Include="*.zip" />
 	</ItemGroup>
 </Project>

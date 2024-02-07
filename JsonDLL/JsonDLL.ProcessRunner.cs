@@ -16,7 +16,7 @@ public class ProcessRunner
     //static Form Form = new Form();
     static ProcessRunner()
     {
-        SynchronizationContext syncContext = SynchronizationContext.Current;
+        //SynchronizationContext syncContext = SynchronizationContext.Current;
         int bit = IntPtr.Size * 8;
         var dir = Dirs.ProfilePath("JavaCommons Technologies", "JsonDLL");
         dir = Path.Combine(dir, $"x{bit}");

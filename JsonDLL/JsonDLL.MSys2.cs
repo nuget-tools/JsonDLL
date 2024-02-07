@@ -6,10 +6,14 @@ namespace JsonDLL;
 
 public class MSys2
 {
+#if false
     public static string MSys2Dir;
     public static string MSys2Bin;
+#endif
+    static string resDir = Internal.InstallResourceZip("res.zip");
     static MSys2()
     {
+#if false
         string baseName = "msys2-base-x86_64-20240113";
         string zipPath = Path.Combine(Dirs.ProfilePath(".JsonDLL", ".msys2"), $"{baseName}.zip");
         if (!File.Exists(zipPath))
@@ -27,6 +31,7 @@ public class MSys2
             Util.Log($"Extracting to {MSys2Dir}...Done");
         }
         MSys2Bin = Path.Combine(MSys2Dir, "usr\\bin");
+#endif
     }
     public static void Initialize()
     {
@@ -59,6 +64,8 @@ public class MSys2
         return child.ExitCode;
     }
 #endif
+
+#if false
     public static int RunBashScript(bool windowed, string script, string cwd = "")
     {
         string bashExe = Path.Combine(MSys2.MSys2Bin, "bash.exe");
@@ -81,24 +88,26 @@ public class MSys2
         bool result = ProcessRunner.LaunchProcess(windowed, bashExe, new string[] { tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH }}, tempFile);
         return result;
     }
-    [Flags]
-    internal enum MoveFileFlags
+#endif
+    public static int RunBashScript(bool windowed, string script, string cwd = "")
     {
-        None = 0,
-        ReplaceExisting = 1,
-        CopyAllowed = 2,
-        DelayUntilReboot = 4,
-        WriteThrough = 8,
-        CreateHardlink = 16,
-        FailIfNotTrackable = 32,
+        string busyboxExe = Path.Combine(resDir, "busybox.exe");
+        string tempFile = Path.GetTempFileName();
+        File.WriteAllText(tempFile, script);
+        string PATH = Environment.GetEnvironmentVariable("PATH");
+        PATH = resDir + ";" + PATH;
+        int result = ProcessRunner.RunProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH } });
+        File.Delete(tempFile);
+        return result;
     }
-
-    internal static class NativeMethods
+    public static bool LaunchBashScript(bool windowed, string script, string cwd = "")
     {
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern bool MoveFileEx(
-            string lpExistingFileName,
-            string lpNewFileName,
-            MoveFileFlags dwFlags);
+        string busyboxExe = Path.Combine(resDir, "busybox.exe");
+        string tempFile = Path.GetTempFileName();
+        File.WriteAllText(tempFile, script);
+        string PATH = Environment.GetEnvironmentVariable("PATH");
+        PATH = resDir + ";" + PATH;
+        bool result = ProcessRunner.LaunchProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH } }, tempFile);
+        return result;
     }
 }
