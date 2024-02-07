@@ -11,6 +11,7 @@ namespace JsonDLL;
 
 internal static class WinConsole
 {
+#if false
     delegate void proto_AfterAllocConsole();
     static proto_AfterAllocConsole AfterAllocConsole;
     static WinConsole()
@@ -44,6 +45,7 @@ internal static class WinConsole
         IntPtr funcPtr = GetProcAddress(handle, "AfterAllocConsole");
         AfterAllocConsole = (proto_AfterAllocConsole)Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(proto_AfterAllocConsole));
     }
+#endif
     static public void Initialize(bool alwaysCreateNewConsole = true)
     {
         bool consoleAttached = true;
@@ -66,7 +68,7 @@ internal static class WinConsole
         var stderr = new StreamWriter(Console.OpenStandardError(), Encoding.Default);
         stderr.AutoFlush = true;
         Console.SetError(stderr);
-#if true
+#if false
         AfterAllocConsole();
 #endif
     }
