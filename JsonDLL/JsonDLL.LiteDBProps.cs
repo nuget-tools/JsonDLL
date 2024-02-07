@@ -53,5 +53,22 @@ public class LiteDBProps
         this.collection.Update(result);
         this.connection.Commit();
     }
-
+    public void Delete(string name)
+    {
+        this.connection.BeginTrans();
+        var result = this.collection.Find(x => x.Name == name).FirstOrDefault();
+        if (result == null)
+        {
+            this.connection.Commit();
+            return;
+        }
+        this.collection.Delete(result.Id);
+        this.connection.Commit();
+    }
+    public void DeleteAll()
+    {
+        this.connection.BeginTrans();
+        this.collection.DeleteAll();
+        this.connection.Commit();
+    }
 }
