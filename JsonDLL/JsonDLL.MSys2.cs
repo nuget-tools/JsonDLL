@@ -93,7 +93,8 @@ public class MSys2
     {
         string busyboxExe = Path.Combine(resDir, "busybox.exe");
         string tempFile = Path.GetTempFileName();
-        File.WriteAllText(tempFile, script);
+        //File.WriteAllText(tempFile, script);
+        DLL1.API.CallOne("write_all_text_local8bit", new string[] { tempFile, script });
         string PATH = Environment.GetEnvironmentVariable("PATH");
         PATH = resDir + ";" + PATH;
         int result = ProcessRunner.RunProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH } });
@@ -104,7 +105,8 @@ public class MSys2
     {
         string busyboxExe = Path.Combine(resDir, "busybox.exe");
         string tempFile = Path.GetTempFileName();
-        File.WriteAllText(tempFile, script);
+        //File.WriteAllText(tempFile, script);
+        DLL1.API.CallOne("write_all_text_local8bit", new string[] { tempFile, script });
         string PATH = Environment.GetEnvironmentVariable("PATH");
         PATH = resDir + ";" + PATH;
         bool result = ProcessRunner.LaunchProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH } }, tempFile);

@@ -11,6 +11,29 @@ namespace JsonDLL;
 
 public class Internal
 {
+    public static string InstallResourceDll(string name)
+    {
+        int bit = IntPtr.Size * 8;
+        var dir = Dirs.ProfilePath("JavaCommons Technologies", "JsonDLL");
+        dir = Path.Combine(dir, $"x{bit}");
+        var dllBytes = Util.ResourceAsBytes(typeof(ProcessRunner).Assembly, $"JsonDLL:{name}-x{bit}.dll");
+        SHA256 crypto = new SHA256CryptoServiceProvider();
+        byte[] hashValue = crypto.ComputeHash(dllBytes);
+        string sha256 = String.Join("", hashValue.Select(x => x.ToString("x2")).ToArray());
+        string dllName = $"{name}-{sha256}.dll";
+        var dllPath = Path.Combine(dir, dllName);
+        if (File.Exists(dllPath))
+        {
+            Util.Log($"{dllPath} is installed");
+        }
+        else
+        {
+            Dirs.PrepareForFile(dllPath);
+            File.WriteAllBytes(dllPath, dllBytes);
+            Util.Log($"{dllPath} has been written");
+        }
+        return dllPath;
+    }
     public static string InstallResourceZip(string name)
     {
         int bit = IntPtr.Size * 8;
