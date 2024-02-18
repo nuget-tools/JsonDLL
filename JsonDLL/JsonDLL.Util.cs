@@ -23,6 +23,75 @@ public class Util
     static Util()
     {
     }
+    public static string RandomString(Random r, string[] chars, int length)
+    {
+        if (chars.Length == 0 || length < 0)
+        {
+            throw new ArgumentException();
+        }
+        var sb = new StringBuilder();
+        for (int i = 0; i < length; i++)
+        {
+            int idx = r.Next(0, chars.Length);
+            sb.Append(chars[idx]);
+        }
+        return sb.ToString();
+    }
+    public static string ToIdentifier(string name)
+    {
+        var sb = new StringBuilder();
+        char last = '\0';
+        for (int i = 0; i < name.Length; i++)
+        {
+            var c = name[i];
+            if (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9'))
+            {
+                ;
+            }
+            else
+            {
+                c = '_';
+            }
+            if (last == '_' && c == '_')
+            {
+                ;
+            }
+            else
+            {
+                sb.Append(c);
+            }
+            last = c;
+        }
+        return sb.ToString();
+    }
+    public static string[] ExpandWildcard(string path)
+    {
+        string? dir = Path.GetDirectoryName(path);
+        if (string.IsNullOrEmpty(dir)) dir = ".";
+        //Util.Print(dir, "dir");
+        string fname = Path.GetFileName(path);
+        //Util.Print(fname, "fname");
+        string[] files = Directory.GetFiles(dir, fname);
+        List<string> result = new List<string>();
+        for (int i = 0; i < files.Length; i++)
+        {
+            result.Add(Path.GetFullPath(files[i]));
+        }
+
+        return result.ToArray();
+    }
+    public static string[] ExpandWildcardList(params string[] pathList)
+    {
+        List<string> result = new List<string>();
+        for (int i = 0; i < pathList.Length; i++)
+        {
+            //Util.Print(pathList[i], "pathList[i]");
+            string[] files = ExpandWildcard(pathList[i]);
+            result.AddRange(files.ToList());
+        }
+
+        return result.ToArray();
+    }
     public static void AllocConsole()
     {
         WinConsole.Initialize();
