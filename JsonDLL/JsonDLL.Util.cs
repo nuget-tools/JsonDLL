@@ -23,6 +23,19 @@ public class Util
     static Util()
     {
     }
+    public static string[] TextToLines(string text)
+    {
+        List<string> lines = new List<string>();
+        using (StringReader sr = new StringReader(text))
+        {
+            string line;
+            while ((line = sr.ReadLine()) != null)
+            {
+                lines.Add(line);
+            }
+        }
+        return lines.ToArray();
+    }
     public static string RandomString(Random r, string[] chars, int length)
     {
         if (chars.Length == 0 || length < 0)
