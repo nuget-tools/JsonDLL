@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Jint.Native;
 using System.Dynamic;
-using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -10,6 +8,12 @@ namespace JsonDLL;
 
 public static class Extensions
 {
+    public static dynamic? ToDynamic(this JsValue x)
+    {
+        if (x == null) return null;
+        var newton = Util.FromObject(x.ToObject());
+        return Util.FromNewton(newton);
+    }
     public static dynamic? FromJson(this string x)
     {
         if (x == null) return null;
