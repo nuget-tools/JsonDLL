@@ -26,9 +26,26 @@ public class API
 
 static class APIHandler
 {
+    static Dictionary<int, JsonAPI> apiMap = new Dictionary<int, JsonAPI>();
     static APIHandler()
     {
         Initializer.Initialize();
+    }
+    [DllExport]
+    [STAThread]
+    public static int LoadAPI(IntPtr dllSpecAddr)
+    {
+        JsonDLL.JsonAPI jsonAPI = new JsonDLL.JsonAPI(Util.UTF8AddrToString(dllSpecAddr));
+        int idx = apiMap.Keys.Count;
+        apiMap[idx] = jsonAPI;
+        return idx;
+    }
+    [DllExport]
+    [STAThread]
+    public static IntPtr CallAPI(int idx, IntPtr nameAddr, IntPtr inputAddr)
+    {
+        JsonDLL.JsonAPI jsonAPI = apiMap[idx];
+        return jsonAPI.CallThru(nameAddr, inputAddr);
     }
     [DllExport]
     [STAThread]
@@ -37,5 +54,4 @@ static class APIHandler
         JsonDLL.JsonAPI jsonAPI = new JsonDLL.JsonAPI();
         return jsonAPI.HandleCall(typeof(API), nameAddr, inputAddr);
     }
-
 }

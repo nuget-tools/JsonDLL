@@ -57,6 +57,11 @@ public class JsonAPI
             Environment.Exit(1);
         }
     }
+    public IntPtr CallThru(IntPtr nameAddr, IntPtr argsAddr)
+    {
+        proto_Call pCall = (proto_Call)Marshal.GetDelegateForFunctionPointer(this.funcPtr, typeof(proto_Call));
+        return pCall(nameAddr, argsAddr);
+    }
     public dynamic Call(dynamic name, dynamic args)
     {
         IntPtr pName = Util.StringToUTF8Addr(name);
