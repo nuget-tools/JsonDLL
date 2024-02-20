@@ -5,9 +5,6 @@ cwd=`pwd`
 ts=`date "+%Y.%m%d.%H%M.%S"`
 version="${ts}"
 
-#cd $cwd
-#g++ -shared -o JsonDLL/AfterAllocConsole-x64.dll AfterAllocConsole.cpp  -static
-
 cd $cwd/JsonDLL
 #sed -i -e "s/<Version>.*<\/Version>/<Version>${version}<\/Version>/g" JsonDLL.csproj
 rm -rf obj bin packages
@@ -16,7 +13,14 @@ dotnet restore JsonDLL.sln -p:Configuration=Release -p:Platform="Any CPU"
 #dotnet pack -o . -p:Configuration=Release -p:Platform="Any CPU" JsonDLL.sln
 msbuild.exe JsonDLL.sln -p:Configuration=Release -p:Platform="Any CPU"
 
-exit 0
+cd $cwd/JsonDLL/bin/Release/net462/x64/
+cp -rp JsonDLL.dll ../JsonDLL-64bit.dll
+cd $cwd/JsonDLL/bin/Release/net462/x86/
+cp -rp JsonDLL.dll ../JsonDLL-32bit.dll
+
+rm -rf ~/cmd/JsonDLL
+mkdir -p ~/cmd/JsonDLL
+cp -rp $cwd/JsonDLL/bin/Release/net462/*.dll ~/cmd/JsonDLL/
 
 cd $cwd
 git add .

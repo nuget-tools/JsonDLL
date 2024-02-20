@@ -1,5 +1,6 @@
-﻿using static JsonDLL.Util;
-using JsonDLL.LiteDB;
+﻿#if true
+using static JsonDLL.Util;
+using LiteDB;
 using System.IO;
 using System.Linq;
 
@@ -73,3 +74,4 @@ public class LiteDBProps
         this.connection.Commit();
     }
 }
+#endif
