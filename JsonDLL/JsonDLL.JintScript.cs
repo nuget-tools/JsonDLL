@@ -1,4 +1,5 @@
-﻿using Jint;
+﻿#if false
+using Jint;
 using System.Reflection;
 
 namespace JsonDLL;
@@ -36,3 +37,4 @@ internal class JintScriptConsole
         Util.Log(x, title);
     }
 }
+#endif

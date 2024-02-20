@@ -1,4 +1,7 @@
-﻿namespace JsonDLL;
+﻿using System;
+using System.Windows.Forms;
+
+namespace JsonDLL;
 
 public class ApplicationIdleTimer
 {
