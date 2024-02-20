@@ -20,7 +20,8 @@ cp -rp JsonDLL.dll ../JsonDLL-32bit.dll
 
 rm -rf ~/cmd/JsonDLL
 mkdir -p ~/cmd/JsonDLL
-cp -rp $cwd/JsonDLL/bin/Release/net462/*.dll ~/cmd/JsonDLL/
+#cp -rp $cwd/JsonDLL/bin/Release/net462/*.dll ~/cmd/JsonDLL/
+cp -rp $cwd/JsonDLL/bin/Release/net462/JsonDLL-*bit.dll ~/cmd/JsonDLL/
 
 cd $cwd
 git add .
