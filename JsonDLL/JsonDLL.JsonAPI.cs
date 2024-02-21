@@ -115,7 +115,7 @@ public class JsonAPI
     public IntPtr CallAPI(int idx, IntPtr nameAddr, IntPtr inputAddr)
     {
         JsonAPI jsonAPI = apiMap[idx];
-        proto_Call pCall = (proto_Call)Marshal.GetDelegateForFunctionPointer(this.funcPtr, typeof(proto_Call));
+        proto_Call pCall = (proto_Call)Marshal.GetDelegateForFunctionPointer(jsonAPI.funcPtr, typeof(proto_Call));
         return pCall(nameAddr, inputAddr);
     }
     [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
