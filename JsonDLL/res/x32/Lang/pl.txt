@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;       : cienislaw
 ;       : pixel
 ;  9.07 : F1xat

@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;       : chavv
 ;       : icobgr
 ;  4.65 : Vassia Atanassova

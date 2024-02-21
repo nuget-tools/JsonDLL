@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;       : Vasileios Karakoidas, Jacaranda Bill, Vasilis Kosmidis
 ;  9.07 : SkyHi [HDManiacs Team]
 ; 15.00 : 2015-05-07: Pete D

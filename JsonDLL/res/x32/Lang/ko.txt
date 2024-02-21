@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;       : ZannyLim (임재형)
 ;       : bzImage
 ;  4.52 : Hyeong il  Kim (kurt Sawyer)

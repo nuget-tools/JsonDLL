@@ -1,4 +1,4 @@
-﻿//using Jint.Native;
+//using Jint.Native;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;

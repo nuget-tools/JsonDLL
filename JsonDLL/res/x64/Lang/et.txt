@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;  3.09 : Kaupo Suviste
 ;  9.07 : Mihkel Tõnnov
 ;

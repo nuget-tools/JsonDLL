@@ -1,4 +1,4 @@
-﻿#if true
+#if true
 using static JsonDLL.Util;
 using LiteDB;
 using System.IO;

@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;       : Carlos Macao
 ;       : João Alves
 ;       : João Frade (100 NOME TR)

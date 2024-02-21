@@ -1,4 +1,4 @@
-﻿// https://codereview.stackexchange.com/questions/70679/seekable-http-range-stream
+// https://codereview.stackexchange.com/questions/70679/seekable-http-range-stream
 using System.IO;
 using System.Net;
 using System;

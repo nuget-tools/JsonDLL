@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;  2.30 :            : Tran Hong Ha
 ;  4.42 :            : Le Vu Hoang
 ;  4.48 :            : Nguyen Hong Quan

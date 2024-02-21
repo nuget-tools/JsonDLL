@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;                    : peterg
 ;                    : Gal Brill
 ;  9.13 : 2010-04-30 : Jonathan Lahav

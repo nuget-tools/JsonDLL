@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;  4.07 : Nicolas Sierro
 ;  9.07 : Philippe Berthault
 ; 15.14 : Sylvain St-Amand (SSTSylvain)

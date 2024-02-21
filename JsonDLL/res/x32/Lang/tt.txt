@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ; 15.10 : 2017-02-12 : Bulat Ibrahim
 ;
 ;

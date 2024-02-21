@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;       : Ara Bakhtiar
 ;  4.66 : Ara Qadir
 ;

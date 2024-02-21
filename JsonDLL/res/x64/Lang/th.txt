@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;  4.09 : Chayanon Ruamcharoen
 ;  4.10 : Zafire06
 ;  9.13 : Kom10

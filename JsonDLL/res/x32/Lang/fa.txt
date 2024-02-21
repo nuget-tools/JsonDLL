@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;  3.12 : Edris Naderan
 ;  4.53 : Mehdi Farhadi
 ;  9.22 : Hessam Mohamadi

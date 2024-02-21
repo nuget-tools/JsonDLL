@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ; 20.02 : 2020-10-21 : Shamsiddinov Zafar
 ;
 ;

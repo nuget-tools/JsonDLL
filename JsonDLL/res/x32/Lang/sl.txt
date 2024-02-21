@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ; 22.01 : 2022-07-17 : Jadran Rudec
 ;
 ;

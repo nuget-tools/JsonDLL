@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;  4.26 : Tomas Miralles
 ;  4.44 : Fernando Verdú
 ;

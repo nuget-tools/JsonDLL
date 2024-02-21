@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;       : Francisco Jr
 ;  4.37 : Fabricio Biazzotto
 ; 23.00 : Atualizado por Felipe

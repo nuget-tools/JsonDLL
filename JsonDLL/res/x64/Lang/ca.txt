@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;  9.07 : Josep Casals, Marc Folch
 ; 17.01 : Benet «BennyBeat» R. i Camps
 ;

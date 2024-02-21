@@ -1,4 +1,4 @@
-﻿#if true
+#if true
 using Jint;
 using System.Reflection;
 

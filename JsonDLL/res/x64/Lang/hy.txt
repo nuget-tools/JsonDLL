@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;       : Gevorg Papikyan
 ; 15.00 : Hrant Ohanyan
 ;

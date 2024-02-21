@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;                    : Andrij Ilechko
 ;                    : Mokiy Mazaylo
 ;                    : Sergiy Gontaruk

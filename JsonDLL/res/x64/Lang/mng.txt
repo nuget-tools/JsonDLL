@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ; 9.20:
 ; Saqirilatu Mongolqileb
 ; last updated: 2014-1-1

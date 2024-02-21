@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;  3.08 : Ari Ryynanen
 ;  4.30 : Jarko P.
 ;  4.42 : Juhani Valtasalmi

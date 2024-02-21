@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;  2.30 : Soeren Finster
 ;  4.07 : JAK-Software.DE
 ;  9.07 : Joachim Henke

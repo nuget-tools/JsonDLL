@@ -1,4 +1,4 @@
-﻿;!@Lang2@!UTF-8!
+;!@Lang2@!UTF-8!
 ;                    : Pablo Rodriguez
 ;                    : Jbc25
 ;       : 2007-09-05 : Guillermo Gabrielli
