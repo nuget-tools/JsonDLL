@@ -7,7 +7,7 @@ version="${ts}"
 
 cd $cwd/JsonDLL
 #sed -i -e "s/<Version>.*<\/Version>/<Version>${version}<\/Version>/g" JsonDLL.csproj
-rm -rf obj bin packages
+rm -rf obj bin
 rm -rf *.nupkg
 dotnet restore JsonDLL.sln -p:Configuration=Release -p:Platform="Any CPU"
 #dotnet pack -o . -p:Configuration=Release -p:Platform="Any CPU" JsonDLL.sln

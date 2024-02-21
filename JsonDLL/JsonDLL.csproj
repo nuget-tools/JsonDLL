@@ -2,10 +2,11 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <TargetFrameworks>net462</TargetFrameworks>
-    <Version>2024.0221.0137.26</Version>
+    <Version>2024.0221.1050.12</Version>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <RootNamespace>JsonDLL</RootNamespace>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <NoWarn>3021,0618,8603,0168,8632,8600,8601,8604</NoWarn>
     <Authors>JavaCommons</Authors>
     <Company>JavaCommons Technologies</Company>
@@ -26,12 +27,6 @@
   <PropertyGroup>
     <DebugType>full</DebugType>
   </PropertyGroup>
-  <PropertyGroup>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup>
-    <CodeAnalysisRuleset>JsonDLL.Json/Newtonsoft.Json.ruleset</CodeAnalysisRuleset>
-  </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -46,85 +41,14 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="LiteDB" Version="5.0.18" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="../README.md" Pack="true" PackagePath="" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="*.dll" />
     <EmbeddedResource Include="*.zip" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="DllExport">
-      <Version>1.7.4</Version>
-      <Visible>false</Visible>
-      <Wz>1</Wz>
-    </PackageReference>
-    <PackageReference Include="ilmerge">
-      <Version>3.0.29</Version>
-    </PackageReference>
-    <PackageReference Include="LiteDB" Version="5.0.18" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
-  <!--
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="$(MicrosoftCodeAnalysisNetAnalyzersPackageVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(MicrosoftSourceLinkGitHubPackageVersion)" PrivateAssets="All" />
-  </ItemGroup>
-  -->
-  <PropertyGroup>
-    <AssemblyTitle>Json.NET .NET 4.5</AssemblyTitle>
-    <DefineConstants>HAVE_SHA1_MANAGED;HAVE_PROCESS;HAVE_ENVIRONMENT;HAVE_ADO_NET;HAVE_APP_DOMAIN;HAVE_ASYNC;HAVE_BIG_INTEGER;HAVE_BINARY_FORMATTER;HAVE_BINARY_SERIALIZATION;HAVE_BINARY_EXCEPTION_SERIALIZATION;HAVE_CAS;HAVE_CHAR_TO_LOWER_WITH_CULTURE;HAVE_CHAR_TO_STRING_WITH_CULTURE;HAVE_COM_ATTRIBUTES;HAVE_COMPONENT_MODEL;HAVE_CONCURRENT_COLLECTIONS;HAVE_COVARIANT_GENERICS;HAVE_DATA_CONTRACTS;HAVE_DATE_TIME_OFFSET;HAVE_DB_NULL_TYPE_CODE;HAVE_DYNAMIC;HAVE_EMPTY_TYPES;HAVE_ENTITY_FRAMEWORK;HAVE_EXPRESSIONS;HAVE_FAST_REVERSE;HAVE_FSHARP_TYPES;HAVE_FULL_REFLECTION;HAVE_GUID_TRY_PARSE;HAVE_HASH_SET;HAVE_ICLONEABLE;HAVE_ICONVERTIBLE;HAVE_IGNORE_DATA_MEMBER_ATTRIBUTE;HAVE_INOTIFY_COLLECTION_CHANGED;HAVE_INOTIFY_PROPERTY_CHANGING;HAVE_ISET;HAVE_LINQ;HAVE_MEMORY_BARRIER;HAVE_METHOD_IMPL_ATTRIBUTE;HAVE_NON_SERIALIZED_ATTRIBUTE;HAVE_READ_ONLY_COLLECTIONS;HAVE_REFLECTION_EMIT;HAVE_REGEX_TIMEOUTS;HAVE_SECURITY_SAFE_CRITICAL_ATTRIBUTE;HAVE_SERIALIZATION_BINDER_BIND_TO_NAME;HAVE_STREAM_READER_WRITER_CLOSE;HAVE_STRING_JOIN_WITH_ENUMERABLE;HAVE_TIME_SPAN_PARSE_WITH_CULTURE;HAVE_TIME_SPAN_TO_STRING_WITH_CULTURE;HAVE_TIME_ZONE_INFO;HAVE_TRACE_WRITER;HAVE_TYPE_DESCRIPTOR;HAVE_UNICODE_SURROGATE_DETECTION;HAVE_VARIANT_TYPE_PARAMETERS;HAVE_VERSION_TRY_PARSE;HAVE_XLINQ;HAVE_XML_DOCUMENT;HAVE_XML_DOCUMENT_TYPE;HAVE_CONCURRENT_DICTIONARY;$(AdditionalConstants)</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Label="8337224c9ad9e356:PreProc">
-    <DebugType Condition="'$(DebugType)'!='full' And '$(DebugType)'!='pdbonly'" Label="8337224c9ad9e356:PreProc">pdbonly</DebugType>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DllExportIdent>58E75768-21C9-4769-8F5D-5E8F537F6013</DllExportIdent>
-    <DllExportMetaLibName>DllExport.dll</DllExportMetaLibName>
-    <DllExportNamespace>JsonDLL</DllExportNamespace>
-    <DllExportDDNSCecil>true</DllExportDDNSCecil>
-    <DllExportSkipOnAnyCpu>false</DllExportSkipOnAnyCpu>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DllExportOrdinalsBase>1</DllExportOrdinalsBase>
-    <DllExportGenExpLib>false</DllExportGenExpLib>
-    <DllExportOurILAsm>false</DllExportOurILAsm>
-    <DllExportSysObjRebase>false</DllExportSysObjRebase>
-    <DllExportLeaveIntermediateFiles>false</DllExportLeaveIntermediateFiles>
-    <DllExportTimeout>30000</DllExportTimeout>
-    <DllExportPeCheck>2</DllExportPeCheck>
-    <DllExportPatches>0</DllExportPatches>
-    <DllExportPreProcType>25</DllExportPreProcType>
-    <DllExportILMerge>Newtonsoft.Json.dll
-LiteDB.dll
-</DllExportILMerge>
-    <DllExportPostProcType>0</DllExportPostProcType>
-  </PropertyGroup>
-  <Target Name="DllExportPreProc" BeforeTargets="DllExportMod" Label="8337224c9ad9e356:PreProc">
-    <Copy SourceFiles="$(DllExportMetaLibFullPath)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
-    <Exec Command="$(ILMergeConsolePath) Newtonsoft.Json.dll&#xD;&#xA;LiteDB.dll $(TargetFileName) /out:$(TargetFileName).ilm0.dll" WorkingDirectory="$(TargetDir)" ContinueOnError="true" />
-    <Move SourceFiles="$(TargetDir)$(TargetFileName).ilm0.dll" DestinationFiles="$(TargetDir)$(TargetFileName)" OverwriteReadOnlyFiles="true" ContinueOnError="true" />
-    <Delete Files="$(TargetDir)$(DllExportMetaLibName)" ContinueOnError="true" />
-  </Target>
-  <Target Name="DllExportPreProcAfter" AfterTargets="DllExportMod" Label="8337224c9ad9e356:PreProc">
-    <Delete Files="$(TargetDir)$(TargetFileName).ilm0.pdb" ContinueOnError="true" />
-  </Target>
-  <ImportGroup Label=".NET DllExport">
-    <Import Project="$(SolutionDir)packages\DllExport.1.7.4\tools\net.r_eg.DllExport.targets" Condition="Exists($([MSBuild]::Escape('$(SolutionDir)packages\DllExport.1.7.4\tools\net.r_eg.DllExport.targets')))" Label="8337224c9ad9e356" />
-  </ImportGroup>
-  <Target Name="DllExportRestorePkg" BeforeTargets="PrepareForBuild">
-    <Error Condition="!Exists('$(SolutionDir)DllExport.bat')" Text="DllExport.bat is not found. Path: '$(SolutionDir)' - https://github.com/3F/DllExport" />
-    <Exec Condition="('$(DllExportModImported)' != 'true' Or !Exists('$(SolutionDir)packages\DllExport.1.7.4\tools\net.r_eg.DllExport.targets')) And Exists('$(SolutionDir)DllExport.bat')" Command=".\DllExport.bat  -action Restore" WorkingDirectory="$(SolutionDir)" />
-    <MSBuild Condition="'$(DllExportModImported)' != 'true'" Projects="$(SolutionDir)packages\DllExport.1.7.4\tools\net.r_eg.DllExport.targets" Targets="DllExportMetaXBaseTarget" Properties="TargetFramework=$(TargetFramework)">
-      <Output TaskParameter="TargetOutputs" PropertyName="DllExportMetaXBase" />
-    </MSBuild>
-    <ItemGroup>
-      <Reference Include="DllExport, PublicKeyToken=8337224c9ad9e356">
-        <HintPath>$(SolutionDir)packages\DllExport.1.7.4\gcache\$(DllExportMetaXBase)\$(DllExportNamespace)\$(DllExportMetaLibName)</HintPath>
-        <Private>False</Private>
-        <SpecificVersion>False</SpecificVersion>
-      </Reference>
-    </ItemGroup>
-  </Target>
-  <Target Name="DllExportRPkgDynamicImport" BeforeTargets="PostBuildEvent" DependsOnTargets="GetFrameworkPaths" Condition="'$(DllExportModImported)' != 'true' And '$(DllExportRPkgDyn)' != 'false'">
-    <MSBuild BuildInParallel="true" UseResultsCache="true" Projects="$(MSBuildProjectFullPath)" Properties="DllExportRPkgDyn=true" Targets="Build" />
-  </Target>
 </Project>
