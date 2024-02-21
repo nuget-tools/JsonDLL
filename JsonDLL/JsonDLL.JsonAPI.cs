@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -7,6 +8,7 @@ namespace JsonDLL;
 
 public class JsonAPI
 {
+    static Dictionary<int, JsonAPI> apiMap = new Dictionary<int, JsonAPI>();
     IntPtr handle = IntPtr.Zero;
     IntPtr funcPtr = IntPtr.Zero;
     delegate IntPtr proto_Call(IntPtr name, IntPtr args);
@@ -57,11 +59,13 @@ public class JsonAPI
             Environment.Exit(1);
         }
     }
+#if false
     public IntPtr CallThru(IntPtr nameAddr, IntPtr argsAddr)
     {
         proto_Call pCall = (proto_Call)Marshal.GetDelegateForFunctionPointer(this.funcPtr, typeof(proto_Call));
         return pCall(nameAddr, argsAddr);
     }
+#endif
     public dynamic Call(dynamic name, dynamic args)
     {
         IntPtr pName = Util.StringToUTF8Addr(name);
@@ -83,8 +87,6 @@ public class JsonAPI
     static ThreadLocal<IntPtr> HandleCallPtr = new ThreadLocal<IntPtr>();
     public IntPtr HandleCall(Type apiType, IntPtr nameAddr, IntPtr inputAddr)
     {
-#if true
-        //Tool.Print("HandleCall(1)");
         if (HandleCallPtr.Value != IntPtr.Zero)
         {
             Util.FreeHGlobal(HandleCallPtr.Value);
@@ -102,9 +104,19 @@ public class JsonAPI
         var output = Util.ToJson(result);
         HandleCallPtr.Value = Util.StringToUTF8Addr(output);
         return HandleCallPtr.Value;
-#else
-        return IntPtr.Zero;
-#endif
+    }
+    public int LoadAPI(IntPtr dllSpecAddr)
+    {
+        JsonAPI jsonAPI = new JsonAPI(Util.UTF8AddrToString(dllSpecAddr));
+        int idx = apiMap.Keys.Count;
+        apiMap[idx] = jsonAPI;
+        return idx;
+    }
+    public IntPtr CallAPI(int idx, IntPtr nameAddr, IntPtr inputAddr)
+    {
+        JsonAPI jsonAPI = apiMap[idx];
+        proto_Call pCall = (proto_Call)Marshal.GetDelegateForFunctionPointer(this.funcPtr, typeof(proto_Call));
+        return pCall(nameAddr, inputAddr);
     }
     [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern IntPtr LoadLibraryW(string lpFileName);
