@@ -28,6 +28,14 @@ public class Util
     static Util()
     {
     }
+    public static uint SessionId()
+    {
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        {
+            return NativeMethods.WTSGetActiveConsoleSessionId();
+        }
+        return 0;
+    }
     public static string[] TextToLines(string text)
     {
         List<string> lines = new List<string>();
@@ -801,5 +809,7 @@ public class Util
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         internal static extern int MessageBoxW(
             IntPtr hWnd, string lpText, string lpCaption, uint uType);
+        [DllImport("kernel32.dll")]
+        internal static extern uint WTSGetActiveConsoleSessionId();
     }
 }
