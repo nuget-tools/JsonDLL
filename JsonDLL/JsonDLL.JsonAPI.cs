@@ -61,14 +61,17 @@ public class JsonAPI
             Environment.Exit(1);
         }
         this.LastErrorPtr = GetProcAddress(Handle, "LastError");
+#if false
         if (this.CallPtr == IntPtr.Zero)
         {
             Util.Log("LastError() not found");
             Environment.Exit(1);
         }
+#endif
     }
     public string? LastError()
     {
+        if (this.LastErrorPtr == IntPtr.Zero) return null;
         proto_LastError pLastError = (proto_LastError)Marshal.GetDelegateForFunctionPointer(this.LastErrorPtr, typeof(proto_LastError));
         IntPtr pResult = pLastError();
         if (pResult == IntPtr.Zero) return null;
