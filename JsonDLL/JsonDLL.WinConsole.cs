@@ -6,9 +6,7 @@ using System;
 using System.Text;
 using System.Security.Cryptography;
 using static JsonDLL.JsonAPI;
-
 namespace JsonDLL;
-
 internal static class WinConsole
 {
 #if false
@@ -53,7 +51,7 @@ internal static class WinConsole
         {
             if (alwaysCreateNewConsole
                 || (AttachConsole(ATTACH_PARRENT) == 0
-                && Marshal.GetLastWin32Error() != ERROR_ACCESS_DENIED))
+                    && Marshal.GetLastWin32Error() != ERROR_ACCESS_DENIED))
             {
                 consoleAttached = AllocConsole() != 0;
             }
@@ -72,7 +70,6 @@ internal static class WinConsole
         AfterAllocConsole();
 #endif
     }
-
     static public void Deinitialize()
     {
         Console.SetOut(TextWriter.Null);
@@ -82,7 +79,6 @@ internal static class WinConsole
             FreeConsole();
         }
     }
-
 #if false
     static FileStream CreateFileStream(string name, uint desAccess, uint shareMode, FileAccess fileAccess)
     {
@@ -91,25 +87,21 @@ internal static class WinConsole
         return !file.IsInvalid ? new FileStream(file, fileAccess) : null;
     }
 #endif
-
     #region Win API Functions and Constants
     [DllImport("kernel32.dll",
-        EntryPoint = "AllocConsole",
-        SetLastError = true,
-        CharSet = CharSet.Auto,
-        CallingConvention = CallingConvention.StdCall)]
+               EntryPoint = "AllocConsole",
+               SetLastError = true,
+               CharSet = CharSet.Auto,
+               CallingConvention = CallingConvention.StdCall)]
     private static extern int AllocConsole();
-
     [DllImport("kernel32.dll",
-        EntryPoint = "AttachConsole",
-        SetLastError = true,
-        CharSet = CharSet.Auto,
-        CallingConvention = CallingConvention.StdCall)]
+               EntryPoint = "AttachConsole",
+               SetLastError = true,
+               CharSet = CharSet.Auto,
+               CallingConvention = CallingConvention.StdCall)]
     private static extern UInt32 AttachConsole(UInt32 dwProcessId);
-
     [DllImport("kernel32.dll")]
     private static extern bool FreeConsole();
-
     private const UInt32 ERROR_ACCESS_DENIED = 5;
     private const UInt32 ATTACH_PARRENT = 0xFFFFFFFF;
 #if false
@@ -119,10 +111,10 @@ internal static class WinConsole
         FILE_SHARE_READ = 1,
         FILE_SHARE_WRITE = 2;
     [DllImport("kernel32.dll",
-        CharSet = CharSet.Auto,
-        CallingConvention = CallingConvention.StdCall)]
+               CharSet = CharSet.Auto,
+               CallingConvention = CallingConvention.StdCall)]
     public static extern
     nint CreateFileW(string fileName, uint desAccess, uint shareMode, nint securityAttb, uint creationDispose, uint flagsAndAttb, nint templateFile);
 #endif
-#endregion
+    #endregion
 }

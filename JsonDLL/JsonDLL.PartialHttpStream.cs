@@ -9,19 +9,23 @@ using static JsonDLL.Util;
 //using CurlThin.SafeHandles;
 using System.Text;
 using System.Web.Routing;
-
 namespace JsonDLL;
-
 class PartialHTTPStream : Stream, IDisposable
 {
     Stream stream = null;
     WebResponse resp = null;
-
-    public string Url { get; private set; }
-    public override bool CanRead { get { return true; } }
-    public override bool CanWrite { get { return false; } }
-    public override bool CanSeek { get { return true; } }
-
+    public string Url {
+        get; private set;
+    }
+    public override bool CanRead {
+        get { return true; }
+    }
+    public override bool CanWrite {
+        get { return false; }
+    }
+    public override bool CanSeek {
+        get { return true; }
+    }
     long position = 0;
     public override long Position
     {
@@ -37,7 +41,6 @@ class PartialHTTPStream : Stream, IDisposable
             //Log($"Seek {value}");
         }
     }
-
     long? length;
     public override long Length
     {
@@ -61,17 +64,17 @@ class PartialHTTPStream : Stream, IDisposable
                         req.Abort();
                     }
                 }
-
             }
             return length.Value;
         }
     }
-
-    public PartialHTTPStream(string Url) { this.Url = Url; }
-
+    public PartialHTTPStream(string Url) {
+        this.Url = Url;
+    }
     public override void SetLength(long value)
-    { throw new NotImplementedException(); }
-
+    {
+        throw new NotImplementedException();
+    }
     public override int Read(byte[] buffer, int offset, int count)
     {
         //Log(new { offset = offset, count = count, Position = Position, Length = Length });
@@ -122,31 +125,29 @@ class PartialHTTPStream : Stream, IDisposable
                 req.Abort();
             }
         }
-
     }
-
     public override void Write(byte[] buffer, int offset, int count)
-    { throw new NotImplementedException(); }
-
+    {
+        throw new NotImplementedException();
+    }
     public override long Seek(long pos, SeekOrigin origin)
     {
         switch (origin)
         {
-            case SeekOrigin.End:
-                Position = Length + pos;
-                break;
-            case SeekOrigin.Begin:
-                Position = pos;
-                break;
-            case SeekOrigin.Current:
-                Position += pos;
-                break;
+        case SeekOrigin.End:
+            Position = Length + pos;
+            break;
+        case SeekOrigin.Begin:
+            Position = pos;
+            break;
+        case SeekOrigin.Current:
+            Position += pos;
+            break;
         }
         return Position;
     }
-
-    public override void Flush() { }
-
+    public override void Flush() {
+    }
     new void Dispose()
     {
         base.Dispose();

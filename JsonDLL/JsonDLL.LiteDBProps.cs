@@ -5,16 +5,20 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using static JsonDLL.LiteDBProps;
-
 namespace JsonDLL;
-
 public class LiteDBProps
 {
     public class Prop
     {
-        public long Id { get; set; }
-        public string Name { get; set; }
-        public object Data { get; set; }
+        public long Id {
+            get; set;
+        }
+        public string Name {
+            get; set;
+        }
+        public object Data {
+            get; set;
+        }
     }
     private string filePath = null;
     //private LiteDatabase connection = null;
@@ -72,7 +76,9 @@ public class LiteDBProps
             var result = collection.Find(x => x.Name == name).FirstOrDefault();
             if (result == null)
             {
-                result = new Prop { Name = name, Data = ToObject(data) };
+                result = new Prop {
+                    Name = name, Data = ToObject(data)
+                };
                 collection.Insert(result);
                 connection.Commit();
                 return;

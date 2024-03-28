@@ -7,9 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using static JsonDLL.Util;
-
 namespace JsonDLL;
-
 public class Internal
 {
     public static string InstallResourceDll(string name)

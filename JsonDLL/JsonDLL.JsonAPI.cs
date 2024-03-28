@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
-
 namespace JsonDLL;
-
 public class JsonAPI
 {
     static Dictionary<int, JsonAPI> apiMap = new Dictionary<int, JsonAPI>();

@@ -3,22 +3,28 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using static JsonDLL.Util;
-
 namespace JsonDLL;
-
 public static class TextEmbedder
 {
     const long MinimumCheckLength = 8192;
     //const long MinimumCheckLength = 256;
     internal class SearchResult
     {
-        public long Length { get; set; }
-        public long StartPos { get; set; }
-        public long EndPos { get; set; }
+        public long Length {
+            get; set;
+        }
+        public long StartPos {
+            get; set;
+        }
+        public long EndPos {
+            get; set;
+        }
     }
     private static SearchResult CheckTailBytes(long offset, byte[] bytes)
     {
-        SearchResult result = new SearchResult() { Length = offset + bytes.Length, StartPos = -1, EndPos = -1 };
+        SearchResult result = new SearchResult() {
+            Length = offset + bytes.Length, StartPos = -1, EndPos = -1
+        };
         const string neutral = "IBM437";
         string part = Encoding.GetEncoding(neutral).GetString(bytes);
         string pattern = @"\[/embed(:[0-9a-zA-Z]+)?\]\s*$";
@@ -42,7 +48,6 @@ public static class TextEmbedder
         }
         return result;
     }
-
     private static long GetLength(string path)
     {
         if (path.StartsWith("http:") || path.StartsWith("https:"))
@@ -57,7 +62,6 @@ public static class TextEmbedder
             return fs.Length;
         }
     }
-
     private static byte[] GetHeadBytes(string path, long size)
     {
         if (path.StartsWith("http:") || path.StartsWith("https:"))
@@ -116,7 +120,6 @@ public static class TextEmbedder
             {
                 if (checkLen > fileLen) checkLen = fileLen;
                 {
-
                 }
                 byte[] check = GetTailBytes(path, checkLen);
                 SearchResult checkResult = CheckTailBytes(fileLen - checkLen, check);

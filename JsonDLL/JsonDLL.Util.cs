@@ -15,12 +15,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-
 namespace JsonDLL;
-
 /** @brief MyClass does something
- * @details I have something more long winded to say about it.  See example 
- * in test.cs: @include test.cs */
+* @details I have something more long winded to say about it.  See example
+* in test.cs: @include test.cs */
 public class Util
 {
     public static bool DebugFlag = false;
@@ -103,7 +101,6 @@ public class Util
         {
             result.Add(Path.GetFullPath(files[i]));
         }
-
         return result.ToArray();
     }
     public static string[] ExpandWildcardList(params string[] pathList)
@@ -115,14 +112,12 @@ public class Util
             string[] files = ExpandWildcard(pathList[i]);
             result.AddRange(files.ToList());
         }
-
         return result.ToArray();
     }
     public static void AllocConsole()
     {
         WinConsole.Initialize();
     }
-
     public static void FreeConsole()
     {
         WinConsole.Deinitialize();
@@ -153,10 +148,10 @@ public class Util
     public static List<string> GetMacAddressList()
     {
         var list = NetworkInterface
-            .GetAllNetworkInterfaces()
-            .Where(nic => nic.OperationalStatus == OperationalStatus.Up && nic.NetworkInterfaceType != NetworkInterfaceType.Loopback)
-            .Select(nic => String.Join("-", SplitStringByLengthList(nic.GetPhysicalAddress().ToString().ToLower(), 2)))
-            .ToList();
+                   .GetAllNetworkInterfaces()
+                   .Where(nic => nic.OperationalStatus == OperationalStatus.Up && nic.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                   .Select(nic => String.Join("-", SplitStringByLengthList(nic.GetPhysicalAddress().ToString().ToLower(), 2)))
+                   .ToList();
         return list;
     }
     public static IEnumerable<string> SplitStringByLengthLazy(string str, int maxLength)
@@ -333,7 +328,7 @@ public class Util
         process.OutputDataReceived += (sender, e) => { Console.WriteLine(e.Data); };
         process.ErrorDataReceived += (sender, e) => { Console.Error.WriteLine(e.Data); };
         process.Start();
-        Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e) { process.Kill(); };
+        Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e) { process.Kill(); };
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         process.WaitForExit();
@@ -367,7 +362,6 @@ public class Util
     {
         return System.Reflection.AssemblyName.GetAssemblyName(assembly.Location).Name;
     }
-
     public static int FreeTcpPort()
     {
         // https://stackoverflow.com/questions/138043/find-the-next-tcp-port-in-net
@@ -377,7 +371,6 @@ public class Util
         l.Stop();
         return port;
     }
-
     public static DateTime? AsDateTime(dynamic x)
     {
         if (x is null) return null;
@@ -400,19 +393,16 @@ public class Util
             throw new ArgumentException("x");
         }
     }
-
     public static string FullName(dynamic x)
     {
         if (x is null) return "null";
         string fullName = ((object)x).GetType().FullName;
         return fullName.Split('`')[0];
     }
-
     public static string ToJson(dynamic x, bool indent = false)
     {
         return JsonConvert.SerializeObject(x, indent ? Formatting.Indented : Formatting.None);
     }
-
 #if true
     public static dynamic? FromJson(string json)
     {
@@ -422,28 +412,24 @@ public class Util
             DateParseHandling = DateParseHandling.None
         });
         /*
-        return JObject.Parse(json, new JsonLoadSettings
-        {
+           return JObject.Parse(json, new JsonLoadSettings
+           {
             CommentHandling = CommentHandling.Load
-        });
-        */
+           });
+         */
     }
 #endif
-
-
     public static dynamic? FromJson(byte[] json)
     {
         if (json is null) return null;
         return FromJson(Encoding.UTF8.GetString(json));
     }
-
     public static T? FromJson<T>(string json, T? fallback = default(T))
     {
         //if (String.IsNullOrEmpty(json)) return default(T);
         if (String.IsNullOrEmpty(json)) return fallback;
         return JsonConvert.DeserializeObject<T>(json);
     }
-
     public static byte[] ToBson(dynamic x)
     {
         MemoryStream ms = new MemoryStream();
@@ -452,10 +438,8 @@ public class Util
             JsonSerializer serializer = new JsonSerializer();
             serializer.Serialize(writer, x);
         }
-
         return ms.ToArray();
     }
-
     public static dynamic? FromBson(byte[] bson)
     {
         if (bson is null) return null;
@@ -466,7 +450,6 @@ public class Util
             return serializer.Deserialize(reader);
         }
     }
-
     public static T? FromBson<T>(byte[] bson)
     {
         if (bson is null) return default(T);
@@ -477,43 +460,38 @@ public class Util
             return serializer.Deserialize<T>(reader);
         }
     }
-
     public static dynamic? FromObject(dynamic x)
     {
         if (x is null) return null;
         var o = (dynamic)JObject.FromObject(new { x = x },
-            new JsonSerializer
-            {
-                DateParseHandling = DateParseHandling.None
-            });
+                                            new JsonSerializer
+        {
+            DateParseHandling = DateParseHandling.None
+        });
         return o.x;
     }
-
     public static T? FromObject<T>(dynamic x)
     {
         dynamic? o = FromObject(x);
         if (o is null) return default(T);
         return (T)(o.ToObject<T>());
     }
-
     public static dynamic? ToNewton(dynamic x)
     {
         if (x is null) return null;
         var o = (dynamic)JObject.FromObject(new { x = x },
-            new JsonSerializer
-            {
-                DateParseHandling = DateParseHandling.None
-            });
+                                            new JsonSerializer
+        {
+            DateParseHandling = DateParseHandling.None
+        });
         return o.x;
     }
-
     public static T? ToNewton<T>(dynamic x)
     {
         dynamic? o = FromObject(x);
         if (o is null) return default(T);
         return (T)(o.ToObject<T>());
     }
-
     public static string? ToXml(dynamic x)
     {
         if (x is null) return null;
@@ -521,7 +499,6 @@ public class Util
         {
             return ((XElement)x).ToString();
         }
-
         XDocument? doc;
         if (FullName(x) == "System.Xml.Linq.XDocument")
         {
@@ -533,17 +510,14 @@ public class Util
             doc = JsonConvert.DeserializeXmlNode(json)?.ToXDocument();
             //return "<?>";
         }
-
         return doc is null ? "null" : doc.ToStringWithDeclaration();
     }
-
     public static XDocument? FromXml(string xml)
     {
         if (xml is null) return null;
         XDocument doc = XDocument.Parse(xml);
         return doc;
     }
-
     public static string ToString(dynamic x)
     {
         if (x is null) return "null";
@@ -560,7 +534,6 @@ public class Util
             {
             }
         }
-
         if (x is System.Xml.Linq.XDocument || x is System.Xml.Linq.XElement)
         {
             string xml = ToXml(x);
@@ -594,7 +567,6 @@ public class Util
             }
         }
     }
-
     public static void Print(dynamic x, string? title = null)
     {
         String s = "";
@@ -603,7 +575,6 @@ public class Util
         Console.WriteLine(s);
         System.Diagnostics.Debug.WriteLine(s);
     }
-
     public static void Log(dynamic x, string? title = null)
     {
         String s = "";
@@ -612,7 +583,6 @@ public class Util
         Console.Error.WriteLine("[Log] " + s);
         System.Diagnostics.Debug.WriteLine("[Log] " + s);
     }
-
     public static void Debug(dynamic x, string? title = null)
     {
         if (!DebugFlag) return;
@@ -622,25 +592,21 @@ public class Util
         Console.Error.WriteLine("[Debug] " + s);
         System.Diagnostics.Debug.WriteLine("[Debug] " + s);
     }
-
     public static XDocument ParseXml(string xml)
     {
         XDocument doc = XDocument.Parse(xml);
         return doc;
     }
-
     public static string[] ResourceNames(Assembly assembly)
     {
         return assembly.GetManifestResourceNames();
     }
-
     public static Stream? ResourceAsStream(Assembly assembly, string name)
     {
         string resourceName = name.Contains(":") ? name.Replace(":", ".") : $"{AssemblyName(assembly)}.{name}";
         Stream? stream = assembly.GetManifestResourceStream(resourceName);
         return stream;
     }
-
     public static string StreamAsText(Stream stream)
     {
         if (stream is null) return null; // "";
@@ -650,14 +616,12 @@ public class Util
         stream.Position = pos;
         return text;
     }
-
     public static string ResourceAsText(Assembly assembly, string name)
     {
         string resourceName = name.Contains(":") ? name.Replace(":", ".") : $"{AssemblyName(assembly)}.{name}";
         Stream stream = assembly.GetManifestResourceStream(resourceName);
         return StreamAsText(stream);
     }
-
     public static byte[] StreamAsBytes(Stream stream)
     {
         if (stream is null) return null; // new byte[] { };
@@ -667,34 +631,28 @@ public class Util
         stream.Position = pos;
         return bytes;
     }
-
     public static byte[] ResourceAsBytes(Assembly assembly, string name)
     {
         string resourceName = name.Contains(":") ? name.Replace(":", ".") : $"{AssemblyName(assembly)}.{name}";
         Stream stream = assembly.GetManifestResourceStream(resourceName);
         return StreamAsBytes(stream);
     }
-
     public static dynamic? StreamAsJson(Stream stream)
     {
         string json = StreamAsText(stream);
         return FromJson(json);
     }
-
     public static dynamic? ResourceAsJson(Assembly assembly, string name)
     {
         string json = ResourceAsText(assembly, name);
         return FromJson(json);
     }
-
     public static byte[]? ToUtf8Bytes(string? s)
     {
         if (s is null) return null;
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(s);
         return bytes;
     }
-
-
     public static void Message(dynamic x, string? title = null)
     {
         if (title is null) title = "Message";
@@ -712,7 +670,6 @@ public class Util
             }
             return;
         }
-
         {
             var s = Util.ToString(x);
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -725,9 +682,9 @@ public class Util
             }
         }
         /*
-        if (FullName(x) == "System.Xml.Linq.XDocument" ||
+           if (FullName(x) == "System.Xml.Linq.XDocument" ||
             FullName(x) == "System.Xml.Linq.XElement")
-        {
+           {
             string xml = ToXml(x);
             System.Diagnostics.Debug.WriteLine(xml);
             var s = (string)x;
@@ -739,9 +696,9 @@ public class Util
             {
                 Tool.Log(xml, title);
             }
-        }
-        else
-        {
+           }
+           else
+           {
             string json = ToJson(x, true);
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
@@ -751,16 +708,14 @@ public class Util
             {
                 Tool.Log(json, title);
             }
-        }
-        */
+           }
+         */
     }
-
     public static dynamic? FromNewton(dynamic x)
     {
         dynamic? dyn = FromObject(x);
         return FromNewtonHelper(dyn);
     }
-
     public static dynamic? ToObject(dynamic x)
     {
         dynamic? dyn = FromObject(x);
@@ -772,7 +727,6 @@ public class Util
         if (o is null) return default(T);
         return (T)(o.ToObject<T>());
     }
-
     private static dynamic? FromNewtonHelper(dynamic? x)
     {
         if (x is null) return null;
@@ -802,8 +756,6 @@ public class Util
             return result.Value;
         }
     }
-
-
     internal static class NativeMethods
     {
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]

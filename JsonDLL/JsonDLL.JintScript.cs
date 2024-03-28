@@ -1,9 +1,7 @@
 #if true
 using Jint;
 using System.Reflection;
-
 namespace JsonDLL;
-
 public class JintScript
 {
     public static Jint.Engine CreateEngine(params Assembly[] list)
@@ -25,7 +23,6 @@ var log = _console.log;
         return engine;
     }
 }
-
 internal class JintScriptConsole
 {
     public void print(dynamic x, string? title = null)

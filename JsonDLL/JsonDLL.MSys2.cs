@@ -4,9 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
-
 namespace JsonDLL;
-
 public class MSys2
 {
 #if false
@@ -67,7 +65,6 @@ public class MSys2
         return child.ExitCode;
     }
 #endif
-
 #if false
     public static int RunBashScript(bool windowed, string script, string cwd = "")
     {
@@ -76,7 +73,9 @@ public class MSys2
         File.WriteAllText(tempFile, script);
         string PATH = Environment.GetEnvironmentVariable("PATH");
         PATH = MSys2.MSys2Bin + ";" + PATH;
-        int result = ProcessRunner.RunProcess(windowed, bashExe, new string[] { tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH } });
+        int result = ProcessRunner.RunProcess(windowed, bashExe, new string[] { tempFile }, cwd, new Dictionary<string, string> {
+            { "PATH", PATH }
+        });
         File.Delete(tempFile);
         return result;
     }
@@ -88,7 +87,9 @@ public class MSys2
         File.WriteAllText(tempFile, script);
         string PATH = Environment.GetEnvironmentVariable("PATH");
         PATH = MSys2.MSys2Bin + ";" + PATH;
-        bool result = ProcessRunner.LaunchProcess(windowed, bashExe, new string[] { tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH }}, tempFile);
+        bool result = ProcessRunner.LaunchProcess(windowed, bashExe, new string[] { tempFile }, cwd, new Dictionary<string, string> {
+            { "PATH", PATH }
+        }, tempFile);
         return result;
     }
 #endif
@@ -100,7 +101,9 @@ public class MSys2
         DLL1.API.CallOne("write_all_text_local8bit", new string[] { tempFile, script });
         string PATH = Environment.GetEnvironmentVariable("PATH");
         PATH = resDir + ";" + PATH;
-        int result = ProcessRunner.RunProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH } });
+        int result = ProcessRunner.RunProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> {
+            { "PATH", PATH }
+        });
         File.Delete(tempFile);
         return result;
     }
@@ -112,7 +115,9 @@ public class MSys2
         DLL1.API.CallOne("write_all_text_local8bit", new string[] { tempFile, script });
         string PATH = Environment.GetEnvironmentVariable("PATH");
         PATH = resDir + ";" + PATH;
-        bool result = ProcessRunner.LaunchProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> { { "PATH", PATH } }, tempFile);
+        bool result = ProcessRunner.LaunchProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> {
+            { "PATH", PATH }
+        }, tempFile);
         return result;
     }
 }
