@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
-using System.Runtime.InteropServices;
-using System.Text;
 namespace JsonDLL;
 public class Busybox
 {
@@ -20,15 +16,7 @@ public class Busybox
     {
         string busyboxExe = Path.Combine(resDir, "busybox.exe");
         string tempFile = Path.GetTempFileName();
-        //File.WriteAllText(tempFile, script);
-        Util.Log(tempFile, "tempFile");
         DLL1.API.CallOne("write_all_text_local8bit", new string[] { tempFile, script });
-#if false
-        using (TextWriter tw = new StreamWriter(tempFile, true, Encoding.GetEncoding((int)Util.GetACP())))
-        {
-            tw.Write(script);
-        }
-#endif
         string PATH = Environment.GetEnvironmentVariable("PATH");
         PATH = resDir + ";" + PATH;
         int result = ProcessRunner.RunProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> {
@@ -41,7 +29,6 @@ public class Busybox
     {
         string busyboxExe = Path.Combine(resDir, "busybox.exe");
         string tempFile = Path.GetTempFileName();
-        //File.WriteAllText(tempFile, script);
         DLL1.API.CallOne("write_all_text_local8bit", new string[] { tempFile, script });
         string PATH = Environment.GetEnvironmentVariable("PATH");
         PATH = resDir + ";" + PATH;

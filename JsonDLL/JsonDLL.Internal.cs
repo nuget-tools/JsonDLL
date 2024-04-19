@@ -24,7 +24,7 @@ public class Internal
         var dllPath = Path.Combine(dir, dllName);
         if (File.Exists(dllPath))
         {
-            Util.Log($"{dllPath} is installed");
+            //Util.Log($"{dllPath} is installed");
         }
         else
         {
@@ -45,10 +45,10 @@ public class Internal
         string sha256 = String.Join("", hashValue.Select(x => x.ToString("x2")).ToArray());
         string zipName = $"{Dirs.GetFileNameWithoutExtension(name)}-{sha256}";
         var extractPath = Path.Combine(dir, zipName);
-        Log(extractPath, "extractPath");
+        //Log(extractPath, "extractPath");
         if (Directory.Exists(extractPath))
         {
-            Util.Log($"{extractPath} is installed");
+            //Util.Log($"{extractPath} is installed");
         }
         else
         {

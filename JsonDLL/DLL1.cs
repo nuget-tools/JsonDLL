@@ -10,7 +10,7 @@ public class DLL1
     static DLL1()
     {
         string dllPath = Internal.InstallResourceDll("dll1");
-        Util.Log($"Loading {dllPath}...");
+        //Util.Log($"Loading {dllPath}...");
         API = new JsonAPI(dllPath);
     }
 }

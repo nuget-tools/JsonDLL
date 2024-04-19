@@ -18,9 +18,9 @@ public class JsonAPI
     }
     public JsonAPI(string dllSpec)
     {
-        Util.Log(dllSpec, "dllSpec");
+        //Util.Log(dllSpec, "dllSpec");
         string dllPath = Util.FindExePath(dllSpec);
-        Util.Log(dllPath, "dllPath");
+        //Util.Log(dllPath, "dllPath");
         if (dllPath is null) Environment.Exit(1);
         this.LoadDll(dllPath);
     }
