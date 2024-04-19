@@ -16,7 +16,7 @@ public class MSys2
     {
 #if true
         string baseName = "msys2-base-x86_64-20240113";
-        string zipPath = Path.Combine(Dirs.ProfilePath(".JsonDLL", ".msys2"), $"{baseName}.zip");
+        string zipPath = Path.Combine(Dirs.ProfilePath(".javacommons", "JsonDLL"), @$".msys2\{baseName}.zip");
         if (!File.Exists(zipPath))
         {
             //Dirs.PrepareForFile(zipPath);
