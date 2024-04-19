@@ -16,7 +16,7 @@ public class MSys2
     {
 #if true
         string baseName = "msys2-base-x86_64-20240113";
-        string zipPath = Path.Combine(Dirs.ProfilePath(".javacommons", "JsonDLL"), @$".msys2\{baseName}.zip");
+        string zipPath = Path.Combine(Dirs.ProfilePath(".javacommons", "JsonDLL"), @$"msys2\{baseName}.zip");
         if (!File.Exists(zipPath))
         {
             //Dirs.PrepareForFile(zipPath);
@@ -24,7 +24,7 @@ public class MSys2
             Util.DownloadBinaryFromUrl($"https://github.com/nuget-tools/JsonDLL.Assets/releases/download/64bit/{baseName}.zip", zipPath);
             Util.Log($"Donloading to {zipPath}...Done");
         }
-        MSys2Dir = Path.Combine(Dirs.ProfilePath(".JsonDLL", ".msys2"), $"{baseName}");
+        MSys2Dir = Path.Combine(Dirs.ProfilePath(".javacommons", "JsonDLL"), @$"msys2\{baseName}");
         if (!Directory.Exists(MSys2Dir))
         {
             Util.Log($"Extracting to {MSys2Dir}...");
