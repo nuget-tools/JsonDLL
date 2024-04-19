@@ -69,7 +69,7 @@ public class JsonAPI
     }
     public string LastError()
     {
-        if (this.LastErrorPtr == IntPtr.Zero) return null;
+        if (this.LastErrorPtr == IntPtr.Zero) return "";
         proto_LastError pLastError = (proto_LastError)Marshal.GetDelegateForFunctionPointer(this.LastErrorPtr, typeof(proto_LastError));
         IntPtr pResult = pLastError();
         //if (pResult == IntPtr.Zero) return null;
@@ -91,6 +91,7 @@ public class JsonAPI
         {
             throw new Exception(error);
         }
+        //Util.Log(result, "result");
         return Util.FromJson(result);
     }
     public dynamic CallOne(dynamic name, dynamic args)

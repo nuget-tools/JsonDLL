@@ -30,6 +30,10 @@ public class Util
     static Util()
     {
     }
+    public static uint GetACP()
+    {
+        return NativeMethods.GetACP();
+    }
     public static uint SessionId()
     {
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -913,5 +917,7 @@ public class Util
             IntPtr hWnd, string lpText, string lpCaption, uint uType);
         [DllImport("kernel32.dll")]
         internal static extern uint WTSGetActiveConsoleSessionId();
+        [DllImport("kernel32.dll")]
+        internal static extern uint GetACP();
     }
 }

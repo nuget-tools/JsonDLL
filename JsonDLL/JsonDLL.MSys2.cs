@@ -7,14 +7,14 @@ using System.Runtime.InteropServices;
 namespace JsonDLL;
 public class MSys2
 {
-#if false
+#if true
     public static string MSys2Dir;
     public static string MSys2Bin;
 #endif
-    static string resDir = Internal.InstallResourceZip("res.zip");
+    //static string resDir = Internal.InstallResourceZip("res.zip");
     static MSys2()
     {
-#if false
+#if true
         string baseName = "msys2-base-x86_64-20240113";
         string zipPath = Path.Combine(Dirs.ProfilePath(".JsonDLL", ".msys2"), $"{baseName}.zip");
         if (!File.Exists(zipPath))
@@ -38,7 +38,7 @@ public class MSys2
     {
         ;
     }
-#if false
+#if true
     public static int RunBashScript(string script)
     {
         Util.ProcessMutex.WaitOne();
@@ -65,7 +65,7 @@ public class MSys2
         return child.ExitCode;
     }
 #endif
-#if false
+#if true
     public static int RunBashScript(bool windowed, string script, string cwd = "")
     {
         string bashExe = Path.Combine(MSys2.MSys2Bin, "bash.exe");
@@ -93,31 +93,4 @@ public class MSys2
         return result;
     }
 #endif
-    public static int RunBashScript(bool windowed, string script, string cwd = "")
-    {
-        string busyboxExe = Path.Combine(resDir, "busybox.exe");
-        string tempFile = Path.GetTempFileName();
-        //File.WriteAllText(tempFile, script);
-        DLL1.API.CallOne("write_all_text_local8bit", new string[] { tempFile, script });
-        string PATH = Environment.GetEnvironmentVariable("PATH");
-        PATH = resDir + ";" + PATH;
-        int result = ProcessRunner.RunProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> {
-            { "PATH", PATH }
-        });
-        File.Delete(tempFile);
-        return result;
-    }
-    public static bool LaunchBashScript(bool windowed, string script, string cwd = "")
-    {
-        string busyboxExe = Path.Combine(resDir, "busybox.exe");
-        string tempFile = Path.GetTempFileName();
-        //File.WriteAllText(tempFile, script);
-        DLL1.API.CallOne("write_all_text_local8bit", new string[] { tempFile, script });
-        string PATH = Environment.GetEnvironmentVariable("PATH");
-        PATH = resDir + ";" + PATH;
-        bool result = ProcessRunner.LaunchProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> {
-            { "PATH", PATH }
-        }, tempFile);
-        return result;
-    }
 }
