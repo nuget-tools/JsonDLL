@@ -22,11 +22,13 @@ public class Busybox
         string tempFile = Path.GetTempFileName();
         //File.WriteAllText(tempFile, script);
         Util.Log(tempFile, "tempFile");
-        //DLL1.API.CallOne("write_all_text_local8bit", new string[] { tempFile, script });
+        DLL1.API.CallOne("write_all_text_local8bit", new string[] { tempFile, script });
+#if false
         using (TextWriter tw = new StreamWriter(tempFile, true, Encoding.GetEncoding((int)Util.GetACP())))
         {
             tw.Write(script);
         }
+#endif
         string PATH = Environment.GetEnvironmentVariable("PATH");
         PATH = resDir + ";" + PATH;
         int result = ProcessRunner.RunProcess(windowed, busyboxExe, new string[] { "bash", tempFile }, cwd, new Dictionary<string, string> {
