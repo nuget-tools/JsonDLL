@@ -9,6 +9,7 @@ cd $cwd/JsonDLL
 #sed -i -e "s/<Version>.*<\/Version>/<Version>${version}<\/Version>/g" JsonDLL.csproj
 rm -rf obj bin
 rm -rf *.nupkg
+java -jar ./antlr-4.13.1-complete.jar JSON5.g4 -Dlanguage=CSharp -package JsonDLL.Parser.Json5 -o Parser/Json5
 dotnet pack -o . -p:Configuration=Release -p:Platform="Any CPU"
 
 exit 0

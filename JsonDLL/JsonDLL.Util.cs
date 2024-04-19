@@ -1,3 +1,5 @@
+using Antlr4.Runtime;
+using JsonDLL.Parser.Json5;
 using System.Reflection;
 using System.Net;
 using System.Net.Sockets;
@@ -15,6 +17,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+//using Jint.Native.Json;
+using System.Globalization;
 namespace JsonDLL;
 /** @brief MyClass does something
 * @details I have something more long winded to say about it.  See example
@@ -403,32 +407,178 @@ public class Util
     {
         return JsonConvert.SerializeObject(x, indent ? Formatting.Indented : Formatting.None);
     }
-#if true
     public static dynamic? FromJson(string json)
     {
         if (String.IsNullOrEmpty(json)) return null;
-        return JsonConvert.DeserializeObject(json, new JsonSerializerSettings
-        {
-            DateParseHandling = DateParseHandling.None
-        });
-        /*
-           return JObject.Parse(json, new JsonLoadSettings
-           {
-            CommentHandling = CommentHandling.Load
-           });
-         */
+        var inputStream = new AntlrInputStream(json);
+        var lexer = new JSON5Lexer(inputStream);
+        var commonTokenStream = new CommonTokenStream(lexer);
+        var parser = new JSON5Parser(commonTokenStream);
+        var context = parser.json5();
+        return Util.FromObject(JSON5ToObject(context));
     }
-#endif
+
     public static dynamic? FromJson(byte[] json)
     {
         if (json is null) return null;
         return FromJson(Encoding.UTF8.GetString(json));
     }
+
     public static T? FromJson<T>(string json, T? fallback = default(T))
     {
         //if (String.IsNullOrEmpty(json)) return default(T);
         if (String.IsNullOrEmpty(json)) return fallback;
         return JsonConvert.DeserializeObject<T>(json);
+    }
+    private static dynamic? JSON5ToObject(ParserRuleContext x)
+    {
+        //Log(Util.FullNamex), "Util.FullNamex)");
+        string fullName = Util.FullName(x);
+        switch (fullName)
+        {
+            case "JsonDLL.Parser.Json5.JSON5Parser+Json5Context":
+                {
+                    for (int i = 0; i < x.children.Count; i++)
+                    {
+                        //Print("  " + Util.FullNamex.children[i]));
+                        //Print("    " + JSON5Terminal((x.children[i])));
+                        if (x.children[i] is Antlr4.Runtime.Tree.ErrorNodeImpl)
+                        {
+                            return null;
+                        }
+                    }
+
+                    return JSON5ToObject((ParserRuleContext)x.children[0]);
+                }
+            case "JsonDLL.Parser.Json5.JSON5Parser+ValueContext":
+                {
+                    if (x.children[0] is Antlr4.Runtime.Tree.TerminalNodeImpl)
+                    {
+                        string t = JSON5Terminal(x.children[0])!;
+                        if (t.StartsWith("\""))
+                        {
+                            return Utf8Json.JsonSerializer.Deserialize<string>(t);
+                        }
+
+                        if (t.StartsWith("'"))
+                        {
+                            //Log(t, "t");
+                            t = t.Substring(1, t.Length - 2).Replace("\\'", ",").Replace("\"", "\\\"");
+                            t = "\"" + t + "\"";
+                            //Log(t, "t");
+                            return Utf8Json.JsonSerializer.Deserialize<string>(t);
+                        }
+
+                        switch (t)
+                        {
+                            case "true":
+                                return true;
+                            case "false":
+                                return false;
+                            case "null":
+                                return null;
+                        }
+
+                        throw new Exception($"Unexpected JSON5Parser+ValueContext: {t}");
+                        //return t;
+                    }
+
+                    return JSON5ToObject((ParserRuleContext)x.children[0]);
+                }
+            case "JsonDLL.Parser.Json5.JSON5Parser+ArrContext":
+                {
+                    var result = new JArray();
+                    for (int i = 0; i < x.children.Count; i++)
+                    {
+                        //Print("  " + Util.FullNamex.children[i]));
+                        if (x.children[i] is JSON5Parser.ValueContext value)
+                        {
+                            result.Add(JSON5ToObject(value));
+                        }
+                    }
+
+                    return result;
+                }
+            case "JsonDLL.Parser.Json5.JSON5Parser+ObjContext":
+                {
+                    var result = new JObject();
+                    for (int i = 0; i < x.children.Count; i++)
+                    {
+                        //Print("  " + Util.FullNamex.children[i]));
+                        if (x.children[i] is JSON5Parser.PairContext pair)
+                        {
+                            var pairObj = JSON5ToObject(pair);
+                            result[(string)pairObj!["key"]] = pairObj["value"];
+                        }
+                    }
+
+                    return result;
+                }
+            case "JsonDLL.Parser.Json5.JSON5Parser+PairContext":
+                {
+                    var result = new JObject();
+                    for (int i = 0; i < x.children.Count; i++)
+                    {
+                        //Print("  " + Util.FullNamex.children[i]));
+                        if (x.children[i] is JSON5Parser.KeyContext key)
+                        {
+                            result["key"] = JSON5ToObject(key);
+                        }
+
+                        if (x.children[i] is JSON5Parser.ValueContext value)
+                        {
+                            result["value"] = JSON5ToObject(value);
+                        }
+                    }
+
+                    return result;
+                }
+            case "JsonDLL.Parser.Json5.JSON5Parser+KeyContext":
+                {
+                    //string t = JSON5Terminal(x.children[0])!;
+                    if (x.children[0] is Antlr4.Runtime.Tree.TerminalNodeImpl)
+                    {
+                        string t = JSON5Terminal(x.children[0])!;
+                        if (t.StartsWith("\""))
+                        {
+                            return Utf8Json.JsonSerializer.Deserialize<string>(t);
+                        }
+
+                        if (t.StartsWith("'"))
+                        {
+                            //Log(t, "t");
+                            t = t.Substring(1, t.Length - 2).Replace("\\'", ",").Replace("\"", "\\\"");
+                            t = "\"" + t + "\"";
+                            //Log(t, "t");
+                            return Utf8Json.JsonSerializer.Deserialize<string>(t);
+                        }
+
+                        return t;
+                    }
+                    else
+                    {
+                        return "?";
+                    }
+                }
+            case "JsonDLL.Parser.Json5.JSON5Parser+NumberContext":
+                {
+                    return decimal.Parse(JSON5Terminal(x.children[0]), CultureInfo.InvariantCulture);
+                }
+            default:
+                throw new Exception($"Unexpected: {fullName}");
+        }
+
+        //return null;
+    }
+
+    private static string? JSON5Terminal(Antlr4.Runtime.Tree.IParseTree x)
+    {
+        if (x is Antlr4.Runtime.Tree.TerminalNodeImpl t)
+        {
+            return t.ToString();
+        }
+
+        return null;
     }
     public static byte[] ToBson(dynamic x)
     {

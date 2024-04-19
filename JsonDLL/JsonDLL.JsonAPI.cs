@@ -60,19 +60,19 @@ public class JsonAPI
         }
         this.LastErrorPtr = GetProcAddress(Handle, "LastError");
 #if false
-        if (this.CallPtr == IntPtr.Zero)
+        if (this.LastErrorPtr == IntPtr.Zero)
         {
             Util.Log("LastError() not found");
             Environment.Exit(1);
         }
 #endif
     }
-    public string? LastError()
+    public string LastError()
     {
         if (this.LastErrorPtr == IntPtr.Zero) return null;
         proto_LastError pLastError = (proto_LastError)Marshal.GetDelegateForFunctionPointer(this.LastErrorPtr, typeof(proto_LastError));
         IntPtr pResult = pLastError();
-        if (pResult == IntPtr.Zero) return null;
+        //if (pResult == IntPtr.Zero) return null;
         string result = Util.UTF8AddrToString(pResult);
         return result;
     }
@@ -86,8 +86,8 @@ public class JsonAPI
         string result = Util.UTF8AddrToString(pResult);
         Marshal.FreeHGlobal(pName);
         Marshal.FreeHGlobal(pArgsJson);
-        string? error = LastError();
-        if (error != null)
+        string error = LastError();
+        if (error != "")
         {
             throw new Exception(error);
         }
@@ -120,7 +120,7 @@ public class JsonAPI
         dynamic result = null;
         if (mi == null)
         {
-            result = null;
+            result = $"API not found: {name}";
             HandleLastErrorPtr.Value = Util.StringToUTF8Addr($"API not found: {name}");
         }
         else
@@ -128,25 +128,11 @@ public class JsonAPI
             try
             {
                 result = mi.Invoke(null, new object[] { args });
-                if (result is null)
-                {
-                    result = new object[] { };
-                }
-                else
-                {
-                    string json = Util.ToJson(result);
-                    if (!json.StartsWith("[") && !json.StartsWith("{"))
-                    {
-                        result = null;
-                        string exp = (string)Util.FromJson(json);
-                        HandleLastErrorPtr.Value = Util.StringToUTF8Addr(exp);
-                    }
-                }
+                HandleLastErrorPtr.Value = Util.StringToUTF8Addr("");
             }
             catch (TargetInvocationException ex)
             {
-                //Util.Log(ex.ToString());
-                result = null;
+                result = ex.InnerException.ToString();
                 HandleLastErrorPtr.Value = Util.StringToUTF8Addr(ex.InnerException.ToString());
             }
         }
