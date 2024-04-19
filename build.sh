@@ -6,7 +6,7 @@ ts=`date "+%Y.%m%d.%H%M.%S"`
 version="${ts}"
 
 cd $cwd/JsonDLL
-#sed -i -e "s/<Version>.*<\/Version>/<Version>${version}<\/Version>/g" JsonDLL.csproj
+sed -i -e "s/<Version>.*<\/Version>/<Version>${version}<\/Version>/g" JsonDLL.csproj
 rm -rf obj bin
 rm -rf *.nupkg
 java -jar ./antlr-4.13.1-complete.jar JSON5.g4 -Dlanguage=CSharp -package JsonDLL.Parser.Json5 -o Parser/Json5
