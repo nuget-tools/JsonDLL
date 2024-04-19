@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-//using Jint.Native.Json;
 using System.Globalization;
 namespace JsonDLL;
 /** @brief MyClass does something
@@ -29,6 +28,10 @@ public class Util
     public static System.Threading.Mutex ProcessMutex = new System.Threading.Mutex(false, "ProcessMutex");
     static Util()
     {
+    }
+    public static string GuidString()
+    {
+        return Guid.NewGuid().ToString("D");
     }
     public static uint GetACP()
     {

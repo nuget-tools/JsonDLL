@@ -2,7 +2,7 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <TargetFrameworks>net462</TargetFrameworks>
-    <Version>2024.0419.2221.42</Version>
+    <Version>2024.0419.2333.34</Version>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <RootNamespace>JsonDLL</RootNamespace>

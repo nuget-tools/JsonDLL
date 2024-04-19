@@ -1,18 +1,15 @@
 using System;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using static JsonDLL.Util;
 namespace JsonDLL;
-public class Internal
+internal class Internal
 {
     public static string InstallResourceDll(string name)
     {
+#if false
         int bit = IntPtr.Size * 8;
         var dir = Dirs.ProfilePath(".javacommons", "JsonDLL");
         dir = Path.Combine(dir, $"x{bit}");
@@ -33,12 +30,21 @@ public class Internal
             Util.Log($"{dllPath} has been written");
         }
         return dllPath;
+#else
+        int bit = IntPtr.Size * 8;
+        return Installer.InstallResourceDll(
+            typeof(Internal).Assembly,
+            Dirs.ProfilePath(".javacommons", "JsonDLL"),
+            $"JsonDLL:{name}-x{bit}.dll"
+            );
+
+#endif
     }
     public static string InstallResourceZip(string name)
     {
+#if false
         int bit = IntPtr.Size * 8;
         var dir = Dirs.ProfilePath(".javacommons", "JsonDLL");
-        //dir = Path.Combine(dir, $"x{bit}");
         var zipBytes = Util.ResourceAsBytes(typeof(Internal).Assembly, $"JsonDLL:{name}");
         SHA256 crypto = new SHA256CryptoServiceProvider();
         byte[] hashValue = crypto.ComputeHash(zipBytes);
@@ -61,5 +67,17 @@ public class Internal
             Util.Log($"{extractPath} has been written");
         }
         return Path.Combine(extractPath, $"x{bit}");
+#else
+        int bit = IntPtr.Size * 8;
+        string dir = Installer.InstallResourceZip(
+            typeof(Internal).Assembly,
+            Dirs.ProfilePath(".javacommons", "JsonDLL"),
+            $"JsonDLL:{name}.zip"
+            );
+        //string result = Path.Combine(dir, $"x{bit}");
+        //Log(result, "result");
+        //return result;
+        return Path.Combine(dir, $"x{bit}");
+#endif
     }
 }

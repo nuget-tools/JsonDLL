@@ -60,7 +60,7 @@ public class Dirs
     {
         if (prefix == null) prefix = "";
         if (suffix == null) suffix = "";
-        var guid = Guid.NewGuid().ToString("D");
+        string guid = Util.GuidString();
         return Path.Combine(Path.GetTempPath(), prefix + guid + suffix);
     }
     public static string GetCurrentDirectory()

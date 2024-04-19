@@ -4,7 +4,7 @@ using System.IO;
 namespace JsonDLL;
 public class Busybox
 {
-    static string resDir = Internal.InstallResourceZip("res.zip");
+    static string resDir = Internal.InstallResourceZip("res");
     static Busybox()
     {
     }
