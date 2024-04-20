@@ -21,3 +21,4 @@ git tag -a v$ts -mv$version
 git push origin v$version
 git push
 git remote -v
+cp -rp $cwd/JsonDLL/JsonDLL.csproj ~/cs/JsonDLL/JsonDLL/
