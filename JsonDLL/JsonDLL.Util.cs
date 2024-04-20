@@ -346,7 +346,7 @@ public class Util
         process.OutputDataReceived += (sender, e) => { Console.WriteLine(e.Data); };
         process.ErrorDataReceived += (sender, e) => { Console.Error.WriteLine(e.Data); };
         process.Start();
-        Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e) { process.Kill(); };
+        Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e) { process.Kill(); };
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         process.WaitForExit();
@@ -448,6 +448,7 @@ public class Util
     {
         //Log(Util.FullNamex), "Util.FullNamex)");
         string fullName = Util.FullName(x);
+#if false
         switch (fullName)
         {
             case "JsonDLL.Parser.Json5.JSON5Parser+Json5Context":
@@ -581,6 +582,140 @@ public class Util
             default:
                 throw new Exception($"Unexpected: {fullName}");
         }
+#else
+        if (fullName.EndsWith(".JSON5Parser+Json5Context"))
+        {
+            for (int i = 0; i < x.children.Count; i++)
+            {
+                //Print("  " + Util.FullNamex.children[i]));
+                //Print("    " + JSON5Terminal((x.children[i])));
+                if (x.children[i] is Antlr4.Runtime.Tree.ErrorNodeImpl)
+                {
+                    return null;
+                }
+            }
+
+            return JSON5ToObject((ParserRuleContext)x.children[0]);
+        }
+        else if (fullName.EndsWith(".JSON5Parser+ValueContext"))
+        {
+            if (x.children[0] is Antlr4.Runtime.Tree.TerminalNodeImpl)
+            {
+                string t = JSON5Terminal(x.children[0])!;
+                if (t.StartsWith("\""))
+                {
+                    return ParseJson(t);
+                }
+
+                if (t.StartsWith("'"))
+                {
+                    //Log(t, "t");
+                    //t = t.Substring(1, t.Length - 2).Replace("\\'", ",").Replace("\"", "\\\"");
+                    //t = "\"" + t + "\"";
+                    //Log(t, "t");
+                    return ParseJson(t);
+                }
+
+                switch (t)
+                {
+                    case "true":
+                        return true;
+                    case "false":
+                        return false;
+                    case "null":
+                        return null;
+                }
+
+                throw new Exception($"Unexpected JSON5Parser+ValueContext: {t}");
+                //return t;
+            }
+
+            return JSON5ToObject((ParserRuleContext)x.children[0]);
+        }
+        else if (fullName.EndsWith(".JSON5Parser+ArrContext"))
+        {
+            var result = new JArray();
+            for (int i = 0; i < x.children.Count; i++)
+            {
+                //Print("  " + Util.FullNamex.children[i]));
+                if (x.children[i] is JSON5Parser.ValueContext value)
+                {
+                    result.Add(JSON5ToObject(value));
+                }
+            }
+
+            return result;
+        }
+        else if (fullName.EndsWith(".JSON5Parser+ObjContext"))
+        {
+            var result = new JObject();
+            for (int i = 0; i < x.children.Count; i++)
+            {
+                //Print("  " + Util.FullNamex.children[i]));
+                if (x.children[i] is JSON5Parser.PairContext pair)
+                {
+                    var pairObj = JSON5ToObject(pair);
+                    result[(string)pairObj!["key"]] = pairObj["value"];
+                }
+            }
+
+            return result;
+        }
+        else if (fullName.EndsWith(".JSON5Parser+PairContext"))
+        {
+            var result = new JObject();
+            for (int i = 0; i < x.children.Count; i++)
+            {
+                //Print("  " + Util.FullNamex.children[i]));
+                if (x.children[i] is JSON5Parser.KeyContext key)
+                {
+                    result["key"] = JSON5ToObject(key);
+                }
+
+                if (x.children[i] is JSON5Parser.ValueContext value)
+                {
+                    result["value"] = JSON5ToObject(value);
+                }
+            }
+
+            return result;
+        }
+        else if (fullName.EndsWith(".JSON5Parser+KeyContext"))
+        {
+            //string t = JSON5Terminal(x.children[0])!;
+            if (x.children[0] is Antlr4.Runtime.Tree.TerminalNodeImpl)
+            {
+                string t = JSON5Terminal(x.children[0])!;
+                if (t.StartsWith("\""))
+                {
+                    return ParseJson(t);
+                }
+
+                if (t.StartsWith("'"))
+                {
+                    //Log(t, "t");
+                    //t = t.Substring(1, t.Length - 2).Replace("\\'", ",").Replace("\"", "\\\"");
+                    //t = "\"" + t + "\"";
+                    //Log(t, "t");
+                    return ParseJson(t);
+                }
+
+                return t;
+            }
+            else
+            {
+                return "?";
+            }
+        }
+        else if (fullName.EndsWith(".JSON5Parser+NumberContext"))
+        {
+            return decimal.Parse(JSON5Terminal(x.children[0]), CultureInfo.InvariantCulture);
+        }
+        else
+        {
+            throw new Exception($"Unexpected: {fullName}");
+        }
+#endif
 
         //return null;
     }
@@ -629,9 +764,9 @@ public class Util
         if (x is null) return null;
         var o = (dynamic)JObject.FromObject(new { x = x },
                                             new JsonSerializer
-        {
-            DateParseHandling = DateParseHandling.None
-        });
+                                            {
+                                                DateParseHandling = DateParseHandling.None
+                                            });
         return o.x;
     }
     public static T? FromObject<T>(dynamic x)
@@ -645,9 +780,9 @@ public class Util
         if (x is null) return null;
         var o = (dynamic)JObject.FromObject(new { x = x },
                                             new JsonSerializer
-        {
-            DateParseHandling = DateParseHandling.None
-        });
+                                            {
+                                                DateParseHandling = DateParseHandling.None
+                                            });
         return o.x;
     }
     public static T? ToNewton<T>(dynamic x)
