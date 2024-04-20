@@ -76,7 +76,7 @@ public class JsonAPI
         string result = Util.UTF8AddrToString(pResult);
         return result;
     }
-    public dynamic Call(dynamic name, dynamic args)
+    public dynamic CallToJson(dynamic name, dynamic args)
     {
         IntPtr pName = Util.StringToUTF8Addr(name);
         proto_Call pCall = (proto_Call)Marshal.GetDelegateForFunctionPointer(this.CallPtr, typeof(proto_Call));
@@ -91,17 +91,29 @@ public class JsonAPI
         {
             throw new Exception(error);
         }
-        //Util.Log(result, "result");
-        return Util.FromJson(result);
+        return result;
     }
-#if false
-    public dynamic CallOne(dynamic name, dynamic args)
+    public dynamic Call(dynamic name, dynamic args)
     {
-        var result = Call(name, args);
-        if (result is null) return null;
-        return result[0];
-    }
+#if false
+        IntPtr pName = Util.StringToUTF8Addr(name);
+        proto_Call pCall = (proto_Call)Marshal.GetDelegateForFunctionPointer(this.CallPtr, typeof(proto_Call));
+        var argsJson = Util.ToJson(args);
+        IntPtr pArgsJson = Util.StringToUTF8Addr(argsJson);
+        IntPtr pResult = pCall(pName, pArgsJson);
+        string result = Util.UTF8AddrToString(pResult);
+        Marshal.FreeHGlobal(pName);
+        Marshal.FreeHGlobal(pArgsJson);
+        string error = LastError();
+        if (error != "")
+        {
+            throw new Exception(error);
+        }
+        return Util.FromJson(result);
+#else
+        return Util.FromJson(CallToJson(name, args));
 #endif
+    }
     public dynamic CallToObject(dynamic name, dynamic args)
     {
         var result = Call(name, args);
