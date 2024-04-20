@@ -94,11 +94,18 @@ public class JsonAPI
         //Util.Log(result, "result");
         return Util.FromJson(result);
     }
+#if false
     public dynamic CallOne(dynamic name, dynamic args)
     {
         var result = Call(name, args);
         if (result is null) return null;
         return result[0];
+    }
+#endif
+    public dynamic CallToObject(dynamic name, dynamic args)
+    {
+        var result = Call(name, args);
+        return Util.ToObject(result);
     }
     static ThreadLocal<IntPtr> HandleCallPtr = new ThreadLocal<IntPtr>();
     static ThreadLocal<IntPtr> HandleLastErrorPtr = new ThreadLocal<IntPtr>();
