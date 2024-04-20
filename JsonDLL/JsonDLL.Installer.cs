@@ -22,7 +22,7 @@ public class Installer
     public static string InstallResourceDll(Assembly assembly, string targetDir, string name)
     {
         string guid = Util.GuidString();
-        var dllBytes = Util.ResourceAsBytes(typeof(ProcessRunner).Assembly, name);
+        var dllBytes = Util.ResourceAsBytes(assembly, name);
         SHA256 crypto = new SHA256CryptoServiceProvider();
         byte[] hashValue = crypto.ComputeHash(dllBytes);
         string sha256 = String.Join("", hashValue.Select(x => x.ToString("x2")).ToArray());
@@ -34,7 +34,7 @@ public class Installer
     public static string InstallResourceZip(Assembly assembly, string targetDir, string name)
     {
         string guid = Util.GuidString();
-        var zipBytes = Util.ResourceAsBytes(typeof(Internal).Assembly, name);
+        var zipBytes = Util.ResourceAsBytes(assembly, name);
         SHA256 crypto = new SHA256CryptoServiceProvider();
         byte[] hashValue = crypto.ComputeHash(zipBytes);
         string sha256 = String.Join("", hashValue.Select(x => x.ToString("x2")).ToArray());

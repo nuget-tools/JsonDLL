@@ -29,6 +29,13 @@ public class Util
     static Util()
     {
     }
+    private static dynamic? ParseJson(string json)
+    {
+        return JsonConvert.DeserializeObject(json, new JsonSerializerSettings
+        {
+            DateParseHandling = DateParseHandling.None
+        });
+    }
     public static string GuidString()
     {
         return Guid.NewGuid().ToString("D");
@@ -464,16 +471,16 @@ public class Util
                         string t = JSON5Terminal(x.children[0])!;
                         if (t.StartsWith("\""))
                         {
-                            return Utf8Json.JsonSerializer.Deserialize<string>(t);
+                            return ParseJson(t);
                         }
 
                         if (t.StartsWith("'"))
                         {
                             //Log(t, "t");
-                            t = t.Substring(1, t.Length - 2).Replace("\\'", ",").Replace("\"", "\\\"");
-                            t = "\"" + t + "\"";
+                            //t = t.Substring(1, t.Length - 2).Replace("\\'", ",").Replace("\"", "\\\"");
+                            //t = "\"" + t + "\"";
                             //Log(t, "t");
-                            return Utf8Json.JsonSerializer.Deserialize<string>(t);
+                            return ParseJson(t);
                         }
 
                         switch (t)
@@ -548,16 +555,16 @@ public class Util
                         string t = JSON5Terminal(x.children[0])!;
                         if (t.StartsWith("\""))
                         {
-                            return Utf8Json.JsonSerializer.Deserialize<string>(t);
+                            return ParseJson(t);
                         }
 
                         if (t.StartsWith("'"))
                         {
                             //Log(t, "t");
-                            t = t.Substring(1, t.Length - 2).Replace("\\'", ",").Replace("\"", "\\\"");
-                            t = "\"" + t + "\"";
+                            //t = t.Substring(1, t.Length - 2).Replace("\\'", ",").Replace("\"", "\\\"");
+                            //t = "\"" + t + "\"";
                             //Log(t, "t");
-                            return Utf8Json.JsonSerializer.Deserialize<string>(t);
+                            return ParseJson(t);
                         }
 
                         return t;
