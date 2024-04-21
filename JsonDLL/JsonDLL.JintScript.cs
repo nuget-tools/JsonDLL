@@ -17,15 +17,16 @@ public class JintScript
                 cfg.AllowClr(list[i]);
             }
         });
-        engine.SetValue("_console", new JintScriptConsole());
-        engine.Execute(@"
-var print = _console.print;
-var log = _console.log;
-");
+        engine.SetValue("_globals", new JintScriptGlobals());
+        engine.Execute("""
+            var print = _globals.print;
+            var log = _globals.log;
+            var getenv = _globals.getenv;
+            """);
         return engine;
     }
 }
-internal class JintScriptConsole
+internal class JintScriptGlobals
 {
     public void print(dynamic x, string? title = null)
     {
@@ -34,6 +35,10 @@ internal class JintScriptConsole
     public void log(dynamic x, string? title = null)
     {
         Util.Log(x, title);
+    }
+    public string getenv(string name)
+    {
+        return System.Environment.GetEnvironmentVariable(name);
     }
 }
 #endif
