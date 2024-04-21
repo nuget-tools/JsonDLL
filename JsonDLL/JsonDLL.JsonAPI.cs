@@ -18,26 +18,35 @@ public class JsonAPI
     }
     public JsonAPI(string dllSpec)
     {
-        //Util.Log(dllSpec, "dllSpec");
         string dllPath = Util.FindExePath(dllSpec);
-        //Util.Log(dllPath, "dllPath");
-        if (dllPath is null) Environment.Exit(1);
+        if (dllPath is null)
+        {
+            Util.Log(dllSpec, "dllSpec");
+            Util.Log(dllPath, "dllPath");
+            Environment.Exit(1);
+        }
         this.LoadDll(dllPath);
     }
     public JsonAPI(string dllSpec, string cwd)
     {
-        Util.Log(dllSpec, "dllSpec");
         string dllPath = Util.FindExePath(dllSpec, cwd);
-        Util.Log(dllPath, "dllPath");
-        if (dllPath is null) Environment.Exit(1);
+        if (dllPath is null)
+        {
+            Util.Log(dllSpec, "dllSpec");
+            Util.Log(dllPath, "dllPath");
+            Environment.Exit(1);
+        }
         this.LoadDll(dllPath);
     }
     public JsonAPI(string dllSpec, Assembly assembly)
     {
-        Util.Log(dllSpec, "dllSpec");
         string dllPath = Util.FindExePath(dllSpec, assembly);
-        Util.Log(dllPath, "dllPath");
-        if (dllPath is null) Environment.Exit(1);
+        if (dllPath is null)
+        {
+            Util.Log(dllSpec, "dllSpec");
+            Util.Log(dllPath, "dllPath");
+            Environment.Exit(1);
+        }
         this.LoadDll(dllPath);
     }
     private void LoadDll(string dllPath)
