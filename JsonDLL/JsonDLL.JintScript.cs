@@ -1,5 +1,8 @@
 #if true
+using Esprima.Ast;
 using Jint;
+using Jint.Native;
+using System;
 using System.Reflection;
 namespace JsonDLL;
 public class JintScript
@@ -8,7 +11,6 @@ public class JintScript
     {
         var engine = new Jint.Engine(cfg =>
         {
-            //cfg.AllowClr(typeof(Global.Util).Assembly);
             cfg.AllowClr();
             for (int i = 0; i < list.Length; i++)
             {

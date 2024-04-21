@@ -1,4 +1,5 @@
 //using Jint.Native;
+using Jint.Native;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -9,14 +10,18 @@ using System.Xml.Linq;
 namespace JsonDLL;
 public static class Extensions
 {
-#if false
-    public static dynamic? ToDynamic(this JsValue x)
+#if true
+    public static dynamic? ToNewton(this JsValue x)
     {
         if (x == null) return null;
         var newton = Util.FromObject(x.ToObject());
         return Util.FromNewton(newton);
     }
 #endif
+    public static void SetTypeReference(this Jint.Engine engine, string name, Type type)
+    {
+        engine.SetValue(name, Jint.Runtime.Interop.TypeReference.CreateTypeReference(engine, type));
+    }
     public static dynamic? FromJson(this string x)
     {
         if (x == null) return null;
