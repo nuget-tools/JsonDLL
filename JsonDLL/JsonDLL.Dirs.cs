@@ -129,12 +129,7 @@ public class Dirs
     }
     public static void CreateDirectory(string path)
     {
-#if false
-        if (!Directory.Exists(Path.GetDirectoryName(path)))
-        {
-            CreateDirectory(Path.GetDirectoryName(path) !);
-        }
-#endif
+        if (string.IsNullOrEmpty(path)) return;
         Directory.CreateDirectory(path);
     }
     public static void Prepare(string dirPath)

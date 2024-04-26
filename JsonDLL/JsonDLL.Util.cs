@@ -147,8 +147,33 @@ public class Util
         FreeConsole();
         AllocConsole();
     }
+    public static void CheckNetworkAvailability(string url)
+    {
+        if (DebugFlag)
+        {
+            string no_network_var = Environment.GetEnvironmentVariable("NO_NETWORK") ?? "0";
+            int no_network;
+            int.TryParse(no_network_var, out no_network);
+            if (no_network != 0)
+            {
+                throw new WebException($"Could not access {url} (NO_NETWORK is set)");
+            }
+        }
+    }
+    public static string GetStringFromUrl(string url)
+    {
+        CheckNetworkAvailability(url);
+        HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+        WebHeaderCollection header = response.Headers;
+        using (var reader = new System.IO.StreamReader(response.GetResponseStream(), Encoding.UTF8))
+        {
+            return reader.ReadToEnd();
+        }
+    }
     public static void DownloadBinaryFromUrl(string url, string destinationPath)
     {
+        CheckNetworkAvailability(url);
         Dirs.PrepareForFile(destinationPath);
         WebRequest objRequest = System.Net.HttpWebRequest.Create(url);
         var objResponse = objRequest.GetResponse();
