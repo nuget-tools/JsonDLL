@@ -3,6 +3,7 @@ using Esprima.Ast;
 using Jint;
 using Jint.Native;
 using System;
+using System.IO;
 using System.Reflection;
 namespace JsonDLL;
 public class JintScript
@@ -22,6 +23,16 @@ public class JintScript
             var print = _globals.print;
             var log = _globals.log;
             var getenv = _globals.getenv;
+            var appFile = _globals.appFile;
+            var appDir = _globals.appDir;
+            var $ns = importNamespace;
+            /*
+            function $ns(name)
+            {
+              return importNamespace(name);
+            }
+            */
+            
             """);
         return engine;
     }
@@ -39,6 +50,14 @@ internal class JintScriptGlobals
     public string getenv(string name)
     {
         return System.Environment.GetEnvironmentVariable(name);
+    }
+    public string appFile()
+    {
+        return Assembly.GetExecutingAssembly().Location;
+    }
+    public string appDir()
+    {
+        return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     }
 }
 #endif

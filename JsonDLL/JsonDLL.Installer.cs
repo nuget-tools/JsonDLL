@@ -63,7 +63,7 @@ public class Installer
     public static void SafeFileWrite(string filePath, byte[] contents)
     {
         if (File.Exists(filePath)) return;
-        Util.Log($"Writing to {filePath}...");
+        Console.Error.WriteLine($"[Log] Writing to {filePath}...");
         string guid = Util.GuidString();
         Dirs.PrepareForFile(filePath);
         File.WriteAllBytes($"{filePath}.{guid}", contents);

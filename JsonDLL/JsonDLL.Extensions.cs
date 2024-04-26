@@ -27,10 +27,12 @@ public static class Extensions
         if (x == null) return null;
         return Util.FromJson(x);
     }
+#if false
     public static T? FromJson<T>(this string x, T? fallback = default(T))
     {
         return Util.FromJson<T>(x, fallback);
     }
+#endif
     public static XmlDocument ToXmlDocument(this XDocument xDocument)
     {
         var xmlDocument = new XmlDocument();

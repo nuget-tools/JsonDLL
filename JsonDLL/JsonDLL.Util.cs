@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Globalization;
+using Esprima.Ast;
 namespace JsonDLL;
 /** @brief MyClass does something
 * @details I have something more long winded to say about it.  See example
@@ -25,6 +26,7 @@ namespace JsonDLL;
 public class Util
 {
     public static bool DebugFlag = false;
+    public static bool UseCppOut = false;
     public static System.Threading.Mutex ProcessMutex = new System.Threading.Mutex(false, "ProcessMutex");
     static Util()
     {
@@ -241,7 +243,8 @@ public class Util
     }
     public static string FindExePath(string exe)
     {
-        string cwd = "";
+        string cwd = AssemblyDirectory(typeof(Util).Assembly);
+        //Util.Print(cwd, "cwd");
         return FindExePath(exe, cwd);
     }
     public static string FindExePath(string exe, string cwd)
@@ -267,11 +270,19 @@ public class Util
     {
         int bit = IntPtr.Size * 8;
         string cwd = AssemblyDirectory(assembly);
-        string result = FindExePath(exe, $"{cwd}\\{bit}bit");
+        string result = FindExePath(exe, cwd);
         if (result == null)
         {
-            cwd = Path.Combine(cwd, "assets");
             result = FindExePath(exe, $"{cwd}\\{bit}bit");
+            if (result == null)
+            {
+                cwd = Path.Combine(cwd, "assets");
+                result = FindExePath(exe, cwd);
+                if (result == null)
+                {
+                    result = FindExePath(exe, $"{cwd}\\{bit}bit");
+                }
+            }
         }
         return result;
     }
@@ -871,7 +882,14 @@ public class Util
         String s = "";
         if (title != null) s = title + ": ";
         s += Util.ToString(x);
-        Console.WriteLine(s);
+        if (!UseCppOut)
+        {
+            Console.WriteLine(s);
+        }
+        else
+        {
+            DLL0.API.Call("write_to_stdout", new string[] { s });
+        }
         System.Diagnostics.Debug.WriteLine(s);
     }
     public static void Log(dynamic x, string? title = null)
@@ -879,7 +897,14 @@ public class Util
         String s = "";
         if (title != null) s = title + ": ";
         s += Util.ToString(x);
-        Console.Error.WriteLine("[Log] " + s);
+        if (!UseCppOut)
+        {
+            Console.Error.WriteLine("[Log] " + s);
+        }
+        else
+        {
+            DLL0.API.Call("write_to_stderr", new string[] { "[Log] " + s });
+        }
         System.Diagnostics.Debug.WriteLine("[Log] " + s);
     }
     public static void Debug(dynamic x, string? title = null)
@@ -888,7 +913,14 @@ public class Util
         String s = "";
         if (title != null) s = title + ": ";
         s += Util.ToString(x);
-        Console.Error.WriteLine("[Debug] " + s);
+        if (!UseCppOut)
+        {
+            Console.Error.WriteLine("[Debug] " + s);
+        }
+        else
+        {
+            DLL0.API.Call("write_to_stderr", new string[] { "[Debug] " + s });
+        }
         System.Diagnostics.Debug.WriteLine("[Debug] " + s);
     }
     public static XDocument ParseXml(string xml)
